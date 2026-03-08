@@ -1,31 +1,65 @@
 {
-  "channel_name": "김기원의 부동산 연구소",
-  "subscribers": 15000,
-  "total_views": 500000,
-  "total_videos": 120,
-  "avg_views_per_video": 4200,
+  "channel_id": "UC3nsb3SxlRrJQ9egkKNnlfg",
+  "channel_name": "리치고TV. 부자되는 부동산 네비",
+  "channel_url": "https://youtube.com/@richgo406",
+  "subscribers": 139000,
+  "total_views": 17892929,
+  "total_videos": 1151,
+  "avg_views_per_video": 39893,
+  "avg_likes_per_video": 799,
+  "engagement_rate": 2.0,
   "niche": "부동산",
   "sub_niches": [
-    "재개발",
-    "청약",
     "전세",
-    "투자전략",
-    "GTX"
+    "집값 전망",
+    "다주택자",
+    "투자 전략",
+    "정부 정책"
   ],
   "target_audience": [
     "부동산 투자자",
     "내집마련 실수요자",
-    "직장인",
-    "사회초년생"
+    "다주택자",
+    "직장인"
   ],
-  "tone": "전문가 신뢰감 + 시의성 강조",
-  "typical_length": "15-20분",
+  "tone": "전문가 신뢰감 + 속보 긴급감 + 빅데이터 근거",
+  "typical_length": "10-20분",
   "top_keywords": [
-    "부동산",
-    "재개발",
-    "청약",
     "전세",
-    "강남",
-    "GTX"
-  ]
+    "다주택",
+    "집값",
+    "투자",
+    "정부",
+    "부동산",
+    "하락",
+    "아파트"
+  ],
+  "top_videos": [
+    {
+      "title": "정부가 전세시장에 손댄다 | 4차 엠바고 분석",
+      "views": 225723,
+      "likes": 1559
+    },
+    {
+      "title": "[속보] 다주택자 돈줄 끊겼다… 집값 붕괴 신호탄?",
+      "views": 94233,
+      "likes": 2481
+    },
+    {
+      "title": "정부가 경고했다… 집 가진 사람들, 이제 선택의 시간",
+      "views": 72224,
+      "likes": 683
+    },
+    {
+      "title": "전세금 HUG가 가져간다? 갭투자 이제 불가능? 전세 제도 핵심 정리",
+      "views": 72024,
+      "likes": 2207
+    },
+    {
+      "title": "한국 집값의 미래, 이미 일본에 있습니다",
+      "views": 52495,
+      "likes": 1229
+    }
+  ],
+  "api_verified": true
 }

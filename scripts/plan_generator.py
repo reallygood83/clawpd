@@ -122,6 +122,123 @@ class PlanGenerator:
 *기획자: YouTube PD Agent v1.0*
 """
 
+    def generate_llm_prompt(self, recommendation: Dict[str, Any],
+                           additional_context: Dict[str, Any] = None) -> str:
+        """Generate a detailed LLM prompt for OpenClaw to create SPECIFIC content"""
+        try:
+            logger.info(f"Generating LLM prompt for: {recommendation.get('topic', 'Unknown')}")
+
+            topic = recommendation.get("topic", "")
+            content_angle = recommendation.get("content_angle", "")
+            sources = recommendation.get("sources", [])
+            tags = recommendation.get("tags", [])
+
+            # Extract channel info
+            channel_niche = self.channel_profile.get("detected_niche", "")
+            channel_tone = self.channel_profile.get("detected_tone", "친근한")
+
+            prompt = f"""# YouTube PD Agent v1.1 - SPECIFIC Content Creation Prompt
+
+## 📋 PROJECT BRIEF
+- **주제**: {topic}
+- **콘텐츠 각도**: {content_angle}
+- **채널 니치**: {channel_niche}
+- **톤앤매너**: {channel_tone}
+- **소스 근거**: {', '.join(sources[:5])}
+- **타겟 키워드**: {', '.join(tags[:10])}
+
+## 🎯 CREATION REQUIREMENTS
+
+### CRITICAL: NO PLACEHOLDERS ALLOWED
+- 절대로 [핵심 내용 1], [구체적 설명] 등 플레이스홀더 사용 금지
+- 모든 내용은 주제에 SPECIFIC하게 작성
+- 실제 사용 가능한 콘텐츠만 생성
+
+### 1. 초 단위 큐시트 (12분 영상 기준)
+다음 구조로 SPECIFIC한 멘트와 B-roll 지시사항 작성:
+
+```
+0:00-0:15 훅
+- 실제 멘트: "{topic}에 대한 충격적인 사실을 발견했는데..."
+- B-roll: {topic} 관련 뉴스 헤드라인
+- 그래픽: "놓치면 후회" 텍스트 오버레이
+
+0:15-0:45 문제 제기
+- 실제 멘트: 구체적인 현황과 문제점 설명
+- B-roll: 관련 데이터, 차트
+- 그래픽: 핵심 수치 강조
+
+[계속해서 12분까지 구체적 구성]
+```
+
+### 2. 완전한 대본 (2000자 이상)
+- 인트로: 구체적인 인사말과 오늘 주제 소개
+- 본론: 5개 핵심 포인트를 실제 정보로 작성
+- 마무리: 구체적인 결론과 액션 아이템
+
+### 3. 썸네일 디자인 3종
+각 디자인마다:
+- 정확한 텍스트 (예: "{topic} 완전 분석" 대신 실제 제목)
+- 구체적 컬러 코드
+- 정확한 레이아웃 지시사항
+
+### 4. SEO 패키지
+- 제목 3안: CTR 8% 이상 목표로 실제 제목
+- 설명란: 실제 타임스탬프와 구체적 내용 요약
+- 태그 30개: 실제 검색 가능한 한국어/영어 태그
+
+### 5. 성과 예측
+- 구체적 조회수 예측 (근거와 함께)
+- 참여율 예상 (채널 히스토리 기반)
+- 신뢰도 및 근거
+
+## 📊 DATA TO USE
+"""
+
+            # Add specific data if available
+            if recommendation.get("demand_score"):
+                prompt += f"\n- 검색 수요 스코어: {recommendation['demand_score']}"
+            if recommendation.get("competition_score"):
+                prompt += f"\n- 경쟁 강도: {recommendation['competition_score']}"
+            if recommendation.get("target_views"):
+                prompt += f"\n- 목표 조회수: {recommendation['target_views']:,}회"
+
+            prompt += f"""
+
+## 🎬 OUTPUT FORMAT
+마크다운 형식으로 다음 구조 준수:
+
+# 🎬 [PD급 기획안] {{실제_제목}}
+
+## 📊 1. 기획 의도 + 데이터 근거
+[구체적 트렌드 분석 및 기획 근거]
+
+## 🎯 2. 초 단위 큐시트 (12분)
+[실제 멘트와 구체적 B-roll 지시사항]
+
+## 📝 3. 전체 대본 초안
+[2000자 이상의 실제 사용 가능한 대본]
+
+## 🎨 4. 썸네일 시안 3종
+[구체적 디자인 지시사항]
+
+## 🔍 5. SEO 패키지
+[실제 제목, 설명, 태그]
+
+## 📈 6. 예상 성과
+[구체적 수치와 근거]
+
+---
+
+**REMEMBER**: 이 프롬프트는 OpenClaw LLM이 처리하여 완전한 PD급 기획안을 생성합니다. 모든 내용은 {topic}에 SPECIFIC해야 하며, 플레이스홀더나 일반적인 내용은 절대 불허합니다.
+"""
+
+            return prompt
+
+        except Exception as e:
+            logger.error(f"Error generating LLM prompt: {e}")
+            return f"# LLM 프롬프트 생성 오류\n\n오류: {str(e)}"
+
     def generate_comprehensive_plan(self, recommendation: Dict[str, Any],
                                    additional_context: Dict[str, Any] = None) -> str:
         """Generate a comprehensive PD-level content plan."""
@@ -301,71 +418,87 @@ class PlanGenerator:
             return 12  # 10-15 minutes default
 
     def _generate_cue_sheet(self, topic: str, content_angle: str, recommendation: Dict[str, Any]) -> str:
-        """Generate second-by-second cue sheet."""
+        """Generate second-by-second cue sheet with SPECIFIC content."""
         try:
             duration_minutes = self._suggest_video_duration(recommendation)
             total_seconds = duration_minutes * 60
 
+            # Extract specific info
+            sources = recommendation.get("sources", [])
+            niche = self.channel_profile.get("detected_niche", "").lower()
+
             # Basic cue sheet structure
             cue_sheet = []
 
-            # Hook (0-15 seconds)
-            cue_sheet.append("""### 🎣 훅 (0:00-0:15)
+            # Generate specific hook based on topic
+            hook_content = self._generate_specific_hook(topic, content_angle, niche)
+            cue_sheet.append(f"""### 🎣 훅 (0:00-0:15)
 **카메라**: 클로즈업 → 미디엄 샷
-**멘트**: "오늘 이 영상 못 보면 정말 후회하실 겁니다"
-**B-roll**: 핫이슈 관련 뉴스 헤드라인
-**그래픽**: 긴급 속보 스타일 자막
-**BGM**: 임팩트 있는 인트로 음악 (90% 볼륨)""")
+**멘트**: "{hook_content}"
+**B-roll**: {topic} 관련 최신 뉴스 헤드라인 몽타주
+**그래픽**: "{topic}" 키워드 + "긴급 분석" 텍스트
+**BGM**: 임팩트 사운드 + 드라마틱 인트로 (90% 볼륨)""")
 
-            # Problem setup (15-45 seconds)
+            # Problem setup with specific content
+            problem_content = self._generate_specific_problem(topic, content_angle, sources)
             cue_sheet.append(f"""### ⚡ 문제 제기 (0:15-0:45)
-**카메라**: 미디엄 샷 유지
-**멘트**: "{topic}에 대해 다들 궁금해하시는데, 정작 정확한 정보는 어디서도 찾기 어렵죠?"
-**B-roll**: 관련 뉴스 클립 몽타주
-**그래픽**: 핵심 키워드 강조 텍스트
+**카메라**: 미디엄 샷, 진지한 표정
+**멘트**: "{problem_content}"
+**B-roll**: {self._get_specific_broll(topic)} 영상
+**그래픽**: 핵심 수치나 데이터 강조
 **BGM**: 긴장감 있는 배경음악 (70% 볼륨)""")
 
-            # Content introduction (45-90 seconds)
+            # Content introduction with specific points
+            main_points = self._generate_specific_main_points(topic, content_angle, recommendation)
+            points_preview = ", ".join([f"{i+1}. {point[:30]}..." for i, point in enumerate(main_points[:5])])
+
             cue_sheet.append(f"""### 📋 목차 소개 (0:45-1:30)
 **카메라**: 와이드 샷 → 미디엄 샷
-**멘트**: "오늘 영상에서는 {topic}에 대한 핵심 포인트 5가지를 정리해드리겠습니다"
-**B-roll**: 목차 관련 B-roll 소재
-**그래픽**: 애니메이션 목차 (1,2,3,4,5)
-**BGM**: 업비트 배경음악 (60% 볼륨)""")
+**멘트**: "오늘 {topic}에 대한 핵심 포인트를 5가지로 정리했습니다. {points_preview[:100]}..."
+**B-roll**: {topic} 관련 자료 화면 전환
+**그래픽**: 애니메이션 목차 리스트 (구체적 포인트명)
+**BGM**: 정보 전달용 업비트 음악 (60% 볼륨)""")
 
-            # Main content sections
+            # Main content sections with specific content
             main_duration = total_seconds - 180  # Minus intro/outro
             section_duration = main_duration // 5  # 5 main points
 
-            for i in range(1, 6):
-                start_time = 90 + (i-1) * section_duration
+            for i in range(5):
+                start_time = 90 + i * section_duration
                 end_time = start_time + section_duration
                 start_min = start_time // 60
                 start_sec = start_time % 60
                 end_min = end_time // 60
                 end_sec = end_time % 60
 
-                cue_sheet.append(f"""### 📌 핵심 포인트 {i} ({start_min}:{start_sec:02d}-{end_min}:{end_sec:02d})
-**카메라**: 미디엄 샷, 제스처 강조
-**멘트**: "{i}번째 포인트는 [구체적 내용]입니다"
-**B-roll**: 포인트 관련 시각적 자료
-**그래픽**: 포인트 {i} 타이틀 + 핵심 내용
-**BGM**: 설명용 배경음악 (50% 볼륨)
-**추가 요소**: 화면 분할로 데이터/차트 표시""")
+                specific_point = main_points[i] if i < len(main_points) else f"{topic}의 {i+1}번째 핵심 요소"
 
-            # Conclusion
+                # Generate specific explanation for this point
+                point_explanation = self._generate_point_explanation(topic, specific_point, i+1, recommendation)
+
+                cue_sheet.append(f"""### 📌 핵심 포인트 {i+1} ({start_min}:{start_sec:02d}-{end_min}:{end_sec:02d})
+**제목**: "{specific_point}"
+**카메라**: 미디엄 샷, 설명 제스처
+**멘트**: "{point_explanation} 실제 데이터와 사례를 통해 상세히 분석해드리겠습니다"
+**B-roll**: {self._get_point_specific_broll(topic, specific_point)}
+**그래픽**: "{specific_point}" 타이틀 + 핵심 데이터
+**BGM**: 설명용 배경음악 (50% 볼륨)
+**추가 요소**: 실제 데이터/차트 화면 분할""")
+
+            # Specific conclusion
+            conclusion_content = self._generate_specific_conclusion(topic, main_points)
             outro_start = total_seconds - 60
             outro_min = outro_start // 60
             outro_sec = outro_start % 60
 
             cue_sheet.append(f"""### 🎯 마무리 ({outro_min}:{outro_sec:02d}-{duration_minutes}:00)
 **카메라**: 클로즈업 → 와이드 샷
-**멘트**: "오늘 {topic}에 대해 정리해봤는데, 어떠셨나요?"
-**B-roll**: 핵심 내용 요약 몽타주
-**그래픽**: 구독/좋아요 애니메이션
+**멘트**: "{conclusion_content}"
+**B-roll**: 핵심 포인트 요약 몽타주
+**그래픽**: 구독/알림 설정 애니메이션
 **BGM**: 마무리 음악 (70% → fade out)
-**CTA**: "구독과 좋아요, 그리고 댓글로 의견 남겨주세요!"
-**엔드스크린**: 관련 영상 2개 추천""")
+**CTA**: "더 궁금한 점은 댓글로, 유용했다면 좋아요와 구독 부탁드려요!"
+**엔드스크린**: 관련 주제 영상 2개 + 구독 버튼""")
 
             return "\n\n".join(cue_sheet)
 
@@ -373,61 +506,135 @@ class PlanGenerator:
             logger.error(f"Error generating cue sheet: {e}")
             return f"**큐시트 생성 중 오류 발생**: {str(e)}"
 
+    def _generate_specific_hook(self, topic: str, content_angle: str, niche: str) -> str:
+        """Generate specific hook content based on topic"""
+        if "부동산" in niche:
+            return f"{topic} 투자 전에 반드시 알아야 할 충격적인 사실을 발견했습니다"
+        elif "ai" in niche.lower() or "테크" in niche:
+            return f"{topic}가 우리 일상을 어떻게 바꿀지 실제로 테스트해봤는데 결과가 놀라웠습니다"
+        else:
+            return f"{topic}에 대한 핵심 정보를 3개월간 분석한 결과를 공개합니다"
+
+    def _generate_specific_problem(self, topic: str, content_angle: str, sources: List[str]) -> str:
+        """Generate specific problem statement"""
+        source_text = f"최근 {sources[0] if sources else '전문 매체'}에서" if sources else "전문 분석에 따르면"
+        return f"{source_text} {topic}에 대한 새로운 정보가 나왔는데, 대부분의 사람들이 이를 놓치고 있어 큰 손실을 보고 있습니다"
+
+    def _generate_specific_main_points(self, topic: str, content_angle: str, recommendation: Dict[str, Any]) -> List[str]:
+        """Generate specific main points based on topic"""
+        niche = self.channel_profile.get("detected_niche", "").lower()
+
+        if "부동산" in topic.lower():
+            return [
+                f"{topic} 현재 시세 및 트렌드 분석",
+                f"{topic} 투자시 주의사항과 리스크",
+                f"{topic} 관련 최신 정책 변화",
+                f"{topic} 실제 투자 사례와 수익률",
+                f"{topic} 향후 전망과 투자 전략"
+            ]
+        elif any(tech in topic.lower() for tech in ["ai", "gpt", "자동화"]):
+            return [
+                f"{topic}의 작동 원리와 핵심 기능",
+                f"{topic} 실제 활용 사례와 성과",
+                f"{topic} 도입시 주의사항",
+                f"{topic} 비용 대비 효과 분석",
+                f"{topic} 향후 발전 방향"
+            ]
+        else:
+            return [
+                f"{topic}의 핵심 개념 정리",
+                f"{topic} 주요 특징과 장점",
+                f"{topic} 실제 적용 방법",
+                f"{topic} 성공 사례 분석",
+                f"{topic} 미래 전망"
+            ]
+
+    def _get_specific_broll(self, topic: str) -> str:
+        """Get specific B-roll suggestions based on topic"""
+        if "부동산" in topic.lower():
+            return "아파트 단지, 분양 현장, 부동산 중개소"
+        elif any(tech in topic.lower() for tech in ["ai", "gpt"]):
+            return "컴퓨터 화면, AI 프로그램 실행, 코딩"
+        else:
+            return f"{topic} 관련 실제 현장"
+
+    def _get_point_specific_broll(self, topic: str, point: str) -> str:
+        """Get point-specific B-roll suggestions"""
+        if "시세" in point or "가격" in point:
+            return "부동산 앱 화면, 시세 그래프"
+        elif "정책" in point:
+            return "뉴스 화면, 정부 발표 자료"
+        elif "기능" in point or "사용법" in point:
+            return "실제 사용 화면, 기능 시연"
+        else:
+            return f"{point} 관련 자료 화면"
+
+    def _generate_specific_conclusion(self, topic: str, main_points: List[str]) -> str:
+        """Generate specific conclusion"""
+        return f"오늘 {topic}에 대해 {len(main_points)}가지 핵심 포인트를 살펴봤습니다. 특히 {main_points[0] if main_points else '첫 번째 포인트'}는 꼭 기억해두시기 바랍니다"
+
     def _generate_full_script(self, topic: str, content_angle: str, recommendation: Dict[str, Any]) -> str:
-        """Generate full video script."""
+        """Generate full video script with SPECIFIC content."""
         try:
             niche = self.channel_profile.get("detected_niche", "")
             tone = self.channel_profile.get("detected_tone", "친근한")
+            channel_name = self.channel_profile.get("channel_title", "우리 채널")
+            sources = recommendation.get("sources", [])
+
+            # Generate specific main points
+            main_points = self._generate_specific_main_points(topic, content_angle, recommendation)
 
             script_sections = []
 
-            # Intro
+            # Specific Intro
+            intro_hook = self._generate_specific_hook(topic, content_angle, niche)
+            sources_mention = f"최근 {sources[0]}에서 발표된 내용" if sources else "최신 전문 자료"
+
             script_sections.append(f"""### 인트로
-안녕하세요, [채널명]입니다!
+안녕하세요, {channel_name}입니다!
 
-오늘은 정말 중요한 이야기를 가져왔어요. {topic}에 대해서 말이죠.
+{intro_hook}
 
-최근에 이 주제로 정말 많은 분들이 궁금해하시는데, 정작 정확하고 신뢰할 만한 정보는 찾기 어려우셨을 거예요.
+{sources_mention}을 바탕으로 {topic}에 대해 정말 중요한 정보를 준비했어요.
 
-그래서 오늘 제가 직접 전문 자료들을 모두 분석해서, 여러분이 꼭 알아야 할 핵심만 정리해드리려고 합니다.
+많은 분들이 {topic}에 관심은 많으시지만, 정작 정확한 정보를 찾기는 어려우셨을 거예요.
 
-이 영상 끝까지 보시면 {topic}에 대해 완전히 정리가 되실 거예요. 바로 시작할게요!""")
+그래서 오늘 제가 직접 전문 자료들을 모두 분석해서, {len(main_points)}가지 핵심 포인트로 정리해드리려고 합니다.
 
-            # Main content
-            script_sections.append(f"""### 메인 콘텐츠
+이 영상 끝까지 보시면 {topic}에 대해 완전히 이해하실 수 있을 거예요. 바로 시작할게요!""")
 
-자, 그럼 {topic}에 대해 본격적으로 알아보겠습니다.
+            # Main content with SPECIFIC points
+            main_content_parts = [f"자, 그럼 {topic}에 대해 본격적으로 알아보겠습니다."]
 
-**첫 번째 포인트: [핵심 내용 1]**
+            for i, point in enumerate(main_points, 1):
+                specific_explanation = self._generate_point_explanation(topic, point, i, recommendation)
+                main_content_parts.append(f"""
 
-먼저 가장 중요한 건 바로 이겁니다. [구체적인 설명과 근거]
+**{i}번째 포인트: {point}**
 
-실제로 최근 데이터를 보면... [데이터 인용]
+{specific_explanation}
 
-이게 왜 중요하냐면... [중요성 설명]
+{self._generate_supporting_evidence(topic, point, sources)}
 
-**두 번째 포인트: [핵심 내용 2]**
+{self._generate_practical_application(topic, point)}""")
 
-두 번째로 알아야 할 건... [설명]
+            script_sections.append("### 메인 콘텐츠\n" + "\n".join(main_content_parts))
 
-여기서 많은 분들이 오해하시는 부분이 있는데... [오해 해결]
-
-실제 사례로 설명드리면... [사례 제시]
-
-[나머지 포인트들도 같은 구조로 전개]""")
-
-            # Conclusion
+            # Specific Conclusion
+            key_takeaway = main_points[0] if main_points else f"{topic}의 핵심"
             script_sections.append(f"""### 마무리
 
-자, 오늘 {topic}에 대해 함께 알아봤는데 어떠셨나요?
+자, 오늘 {topic}에 대해 {len(main_points)}가지 핵심 포인트를 함께 알아봤는데 어떠셨나요?
 
-정말 중요한 포인트들만 정리해서 말씀드렸으니까, 꼭 기억해주시고요.
+정말 중요한 내용들만 압축해서 말씀드렸으니까, 꼭 기억해두시기 바래요.
 
-특히 [가장 중요한 포인트 재강조]는 정말 놓치지 마세요.
+특히 "{key_takeaway}"는 정말 놓치지 마시고요.
 
-더 궁금한 점이 있으시면 댓글로 언제든 질문해주시고,
+더 구체적인 정보나 궁금한 점이 있으시면 댓글로 언제든 질문해주세요. 하나하나 답변드리겠습니다.
 
-이 영상이 도움이 되셨다면 좋아요와 구독 버튼도 눌러주세요.
+이 영상이 도움이 되셨다면 좋아요와 구독, 그리고 알림 설정까지 부탁드려요.
+
+다음에는 {self._suggest_next_topic(topic)}에 대해서도 준비해보겠습니다.
 
 그럼 다음 영상에서 또 만나요. 감사합니다!""")
 
@@ -436,6 +643,42 @@ class PlanGenerator:
         except Exception as e:
             logger.error(f"Error generating full script: {e}")
             return f"**스크립트 생성 중 오류 발생**: {str(e)}"
+
+    def _generate_point_explanation(self, topic: str, point: str, point_number: int, recommendation: Dict[str, Any]) -> str:
+        """Generate specific explanation for each point"""
+        niche = self.channel_profile.get("detected_niche", "").lower()
+
+        if "부동산" in niche and "시세" in point:
+            return f"먼저 {point}부터 살펴보겠습니다. 현재 시장 상황을 보면 정말 많은 변화가 있었어요. 실제 데이터를 보시면..."
+        elif "부동산" in niche and "정책" in point:
+            return f"{point}에 대해서는 최근 정부 발표 내용이 정말 중요해요. 이번 변화가 실제 투자에 미치는 영향을 구체적으로 설명드리면..."
+        elif "ai" in niche.lower() or "테크" in niche:
+            return f"{point}를 실제로 테스트해봤는데요. 결과가 정말 놀라웠어요. 어떤 기능인지 직접 보여드리면..."
+        else:
+            return f"{point}는 {topic}에서 정말 핵심적인 부분이에요. 왜 중요한지 차근차근 설명해드릴게요."
+
+    def _generate_supporting_evidence(self, topic: str, point: str, sources: List[str]) -> str:
+        """Generate supporting evidence for points"""
+        source_text = sources[0] if sources else "전문 기관"
+        return f"실제로 {source_text}의 최신 보고서에 따르면, 이 부분에서 주목할 만한 데이터가 나왔어요. 구체적인 수치를 말씀드리면..."
+
+    def _generate_practical_application(self, topic: str, point: str) -> str:
+        """Generate practical application advice"""
+        if "투자" in point or "부동산" in point:
+            return "이 정보를 실제 투자에 어떻게 활용하실 수 있는지도 말씀드릴게요."
+        elif "ai" in point.lower() or "기능" in point:
+            return "이걸 실제로 여러분의 일상이나 업무에서 어떻게 사용하실 수 있는지도 알려드릴게요."
+        else:
+            return "이 내용을 실생활에서 어떻게 적용하실 수 있는지 팁을 드리면..."
+
+    def _suggest_next_topic(self, current_topic: str) -> str:
+        """Suggest related topic for next video"""
+        if "부동산" in current_topic:
+            return "부동산 투자 전략"
+        elif "ai" in current_topic.lower():
+            return "AI 활용 실무 팁"
+        else:
+            return f"{current_topic} 심화 내용"
 
     def _generate_thumbnail_designs(self, topic: str, content_angle: str) -> str:
         """Generate thumbnail design specifications."""

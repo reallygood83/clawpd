@@ -1,148 +1,202 @@
 """
 Web scraper utility for news and content sources
-Uses urllib for HTTP requests and basic HTML parsing
+Uses requests + BeautifulSoup for robust HTML parsing
 """
-import urllib.request
-import urllib.parse
-from urllib.error import HTTPError, URLError
+import requests
 import json
 import re
-from html.parser import HTMLParser
+from bs4 import BeautifulSoup
 from typing import List, Dict, Optional, Any
 import time
+from datetime import datetime
+import urllib.parse
 
 
-class SimpleHTMLParser(HTMLParser):
-    """Simple HTML parser to extract text content"""
+class ArticleExtractor:
+    """Enhanced article content extractor using BeautifulSoup"""
 
     def __init__(self):
-        super().__init__()
-        self.content = []
-        self.title = ""
-        self.in_title = False
-        self.in_content = False
-        self.skip_tags = {'script', 'style', 'nav', 'footer', 'header', 'aside'}
-        self.current_tag = ""
+        self.content_selectors = [
+            'article', 'main', '.content', '.article', '.post',
+            '.news-content', '.article-content', '.post-content',
+            '.story-content', '.entry-content', '#content',
+            '.article-body', '.news-body', '.post-body'
+        ]
 
-    def handle_starttag(self, tag, attrs):
-        self.current_tag = tag.lower()
+        self.title_selectors = [
+            'h1', '.title', '.headline', '.article-title',
+            '.post-title', '.news-title', 'title',
+            '[property="og:title"]', '.entry-title'
+        ]
 
-        if tag.lower() == 'title':
-            self.in_title = True
-        elif tag.lower() in {'p', 'div', 'article', 'section', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'main', 'content'}:
-            # Check for content-related attributes
-            attrs_dict = dict(attrs) if attrs else {}
-            class_name = attrs_dict.get('class', '').lower()
-            id_name = attrs_dict.get('id', '').lower()
+    def extract(self, soup: BeautifulSoup, url: str = "") -> Dict[str, str]:
+        """Extract title and content from BeautifulSoup object"""
 
-            # Look for content-related classes and IDs
-            content_indicators = ['content', 'article', 'post', 'story', 'news', 'text', 'body', 'main']
-            if any(indicator in class_name or indicator in id_name for indicator in content_indicators):
-                self.in_content = True
-            elif tag.lower() in {'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'}:
-                self.in_content = True
-            elif tag.lower() in {'div', 'article', 'section', 'main'}:
-                self.in_content = True
-        elif tag.lower() in self.skip_tags:
-            self.in_content = False
+        # Extract title
+        title = self._extract_title(soup)
 
-    def handle_endtag(self, tag):
-        if tag.lower() == 'title':
-            self.in_title = False
-        elif tag.lower() in {'p', 'div', 'article', 'section', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'main', 'content'}:
-            self.in_content = False
+        # Extract main content
+        content = self._extract_content(soup)
 
-        self.current_tag = ""
-
-    def handle_data(self, data):
-        data = data.strip()
-        if data:
-            if self.in_title:
-                if not self.title:  # Only take first title found
-                    self.title = data
-            elif self.in_content and self.current_tag not in self.skip_tags:
-                # Filter out very short content and navigation-like text
-                if len(data) >= 10 and not any(skip_word in data.lower() for skip_word in ['클릭', 'more', 'read more', '더보기', '광고', 'ad', 'advertisement']):
-                    self.content.append(data)
-
-    def get_content(self) -> Dict[str, str]:
-        """Get extracted content"""
-        content_text = ' '.join(self.content)
-        # Clean extra whitespace
-        content_text = re.sub(r'\s+', ' ', content_text).strip()
+        # Extract additional metadata
+        date = self._extract_date(soup)
 
         return {
-            'title': self.title.strip(),
-            'content': content_text
+            'title': title,
+            'content': content,
+            'date': date,
+            'url': url
         }
+
+    def _extract_title(self, soup: BeautifulSoup) -> str:
+        """Extract article title"""
+
+        # Try various title selectors
+        for selector in self.title_selectors:
+            element = soup.select_one(selector)
+            if element:
+                title = element.get_text().strip()
+                if title and len(title) > 5:
+                    return title
+
+        # Fallback to page title
+        title_tag = soup.find('title')
+        if title_tag:
+            return title_tag.get_text().strip()
+
+        return "제목 없음"
+
+    def _extract_content(self, soup: BeautifulSoup) -> str:
+        """Extract main article content"""
+
+        content_parts = []
+
+        # Try content selectors in order of preference
+        for selector in self.content_selectors:
+            elements = soup.select(selector)
+            if elements:
+                for element in elements:
+                    text = self._clean_element_text(element)
+                    if text and len(text) > 50:  # Minimum content length
+                        content_parts.append(text)
+
+                # If we found substantial content, use it
+                if content_parts and sum(len(p) for p in content_parts) > 200:
+                    break
+
+        # If no content found with selectors, try paragraphs
+        if not content_parts:
+            paragraphs = soup.find_all('p')
+            for p in paragraphs:
+                text = self._clean_element_text(p)
+                if text and len(text) > 20:
+                    content_parts.append(text)
+
+        return ' '.join(content_parts) if content_parts else "내용을 추출할 수 없습니다"
+
+    def _extract_date(self, soup: BeautifulSoup) -> str:
+        """Extract publication date"""
+
+        date_selectors = [
+            '[property="article:published_time"]',
+            '.date', '.publish-date', '.article-date',
+            'time', '.timestamp', '.created-date'
+        ]
+
+        for selector in date_selectors:
+            element = soup.select_one(selector)
+            if element:
+                # Try datetime attribute first
+                date_text = element.get('datetime') or element.get('content') or element.get_text()
+                if date_text:
+                    return date_text.strip()
+
+        return ""
+
+    def _clean_element_text(self, element) -> str:
+        """Clean text from HTML element"""
+        if not element:
+            return ""
+
+        # Remove unwanted elements
+        for unwanted in element.find_all(['script', 'style', 'nav', 'header', 'footer', 'aside', 'ad', 'advertisement']):
+            unwanted.decompose()
+
+        text = element.get_text(separator=' ')
+
+        # Clean and normalize text
+        text = re.sub(r'\s+', ' ', text).strip()
+
+        # Remove common noise patterns
+        noise_patterns = [
+            r'^\s*\[?\s*(광고|AD|Advertisement)\s*\]?\s*',
+            r'^\s*\[?\s*(클릭|Click|More|더보기|Read More)\s*\]?\s*',
+            r'^\s*\[?\s*(댓글|Comments?|Reply)\s*\]?\s*',
+            r'^\s*\[?\s*(공유|Share|Like|좋아요)\s*\]?\s*'
+        ]
+
+        for pattern in noise_patterns:
+            text = re.sub(pattern, '', text, flags=re.IGNORECASE)
+
+        return text.strip()
 
 
 class WebScraper:
     def __init__(self, delay: float = 1.0):
         """Initialize web scraper with request delay"""
         self.delay = delay
-        self.session_headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8',
-            'Accept-Encoding': 'gzip, deflate',
+        self.session = requests.Session()
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
             'Connection': 'keep-alive',
-        }
+            'Upgrade-Insecure-Requests': '1',
+        })
+        self.article_extractor = ArticleExtractor()
 
-    def fetch_url(self, url: str, timeout: int = 10) -> Dict[str, Any]:
-        """Fetch and parse a web page"""
+    def fetch_url(self, url: str, timeout: int = 15) -> Dict[str, Any]:
+        """Fetch and parse a web page using requests and BeautifulSoup"""
         try:
             # Add delay to be respectful
             time.sleep(self.delay)
 
-            req = urllib.request.Request(url, headers=self.session_headers)
+            # Make request
+            response = self.session.get(url, timeout=timeout, allow_redirects=True)
+            response.raise_for_status()  # Raises an HTTPError for bad responses
 
-            with urllib.request.urlopen(req, timeout=timeout) as response:
-                # Get content type and encoding
-                content_type = response.getheader('Content-Type', '')
-                encoding = 'utf-8'  # Default encoding
+            # Handle encoding - requests usually handles this well
+            if response.apparent_encoding and response.apparent_encoding != response.encoding:
+                response.encoding = response.apparent_encoding
 
-                if 'charset=' in content_type:
-                    encoding = content_type.split('charset=')[1].split(';')[0]
+            # Parse with BeautifulSoup
+            soup = BeautifulSoup(response.text, 'lxml')
 
-                html_content = response.read()
+            # Extract content using our enhanced extractor
+            extracted_data = self.article_extractor.extract(soup, url)
 
-                # Decode with proper encoding
-                try:
-                    html_content = html_content.decode(encoding)
-                except UnicodeDecodeError:
-                    # Fallback to common encodings
-                    for enc in ['utf-8', 'euc-kr', 'cp949']:
-                        try:
-                            html_content = html_content.decode(enc)
-                            break
-                        except UnicodeDecodeError:
-                            continue
-                    else:
-                        html_content = html_content.decode('utf-8', errors='ignore')
-
-                # Parse content
-                parsed_content = self._parse_html(html_content)
-
-                return {
-                    'url': url,
-                    'status_code': response.getcode(),
-                    'title': parsed_content['title'],
-                    'content': parsed_content['content'],
-                    'success': True
-                }
-
-        except HTTPError as e:
             return {
                 'url': url,
-                'status_code': e.code,
-                'error': f'HTTP Error: {e.code} - {e.reason}',
+                'status_code': response.status_code,
+                'title': extracted_data['title'],
+                'content': extracted_data['content'],
+                'date': extracted_data.get('date', ''),
+                'success': True
+            }
+
+        except requests.exceptions.HTTPError as e:
+            return {
+                'url': url,
+                'status_code': e.response.status_code if e.response else None,
+                'error': f'HTTP Error: {e.response.status_code} - {e.response.reason}' if e.response else str(e),
                 'success': False
             }
-        except URLError as e:
+        except requests.exceptions.RequestException as e:
             return {
                 'url': url,
-                'error': f'URL Error: {str(e)}',
+                'error': f'Request Error: {str(e)}',
                 'success': False
             }
         except Exception as e:
@@ -152,40 +206,81 @@ class WebScraper:
                 'success': False
             }
 
-    def _parse_html(self, html: str) -> Dict[str, str]:
-        """Parse HTML content to extract title and text"""
-        parser = SimpleHTMLParser()
-        parser.feed(html)
-        result = parser.get_content()
+    def scrape_news_site(self, url: str, max_articles: int = 10) -> List[Dict[str, Any]]:
+        """Scrape news articles from a website (method expected by source_collector)"""
+        try:
+            # First, get the main page
+            main_result = self.fetch_url(url)
+            if not main_result['success']:
+                return []
 
-        # If no title found, try meta tags
-        if not result['title']:
-            meta_title_pattern = r'<meta[^>]*property=["\']og:title["\'][^>]*content=["\']([^"\']+)["\']'
-            meta_match = re.search(meta_title_pattern, html, re.IGNORECASE)
-            if meta_match:
-                result['title'] = meta_match.group(1)
+            # Parse the main page to find article links
+            response = self.session.get(url, timeout=15)
+            soup = BeautifulSoup(response.text, 'lxml')
 
-        # If still no content, try to extract from common patterns
-        if not result['content'] or len(result['content']) < 100:
-            # Try to find main content areas
-            content_patterns = [
-                r'<div[^>]*class="[^"]*content[^"]*"[^>]*>(.*?)</div>',
-                r'<article[^>]*>(.*?)</article>',
-                r'<main[^>]*>(.*?)</main>',
-                r'<div[^>]*class="[^"]*article[^"]*"[^>]*>(.*?)</div>'
-            ]
+            # Find article links
+            article_links = self._extract_article_links_from_soup(soup, url)
 
-            for pattern in content_patterns:
-                matches = re.findall(pattern, html, re.DOTALL | re.IGNORECASE)
-                if matches:
-                    # Strip HTML tags and clean up
-                    content_text = re.sub(r'<[^>]+>', ' ', ' '.join(matches))
-                    content_text = re.sub(r'\s+', ' ', content_text).strip()
-                    if len(content_text) > len(result['content']):
-                        result['content'] = content_text
-                    break
+            articles = []
+            for link in article_links[:max_articles]:
+                try:
+                    article_result = self.fetch_url(link)
+                    if article_result['success'] and len(article_result['content']) > 100:
+                        articles.append({
+                            'title': article_result['title'],
+                            'content': article_result['content'][:500],  # First 500 chars for summary
+                            'url': link,
+                            'date': article_result.get('date', ''),
+                            'source': self._get_domain_name(url)
+                        })
+                except Exception as e:
+                    continue  # Skip failed articles
 
-        return result
+            return articles
+
+        except Exception as e:
+            print(f"Error scraping {url}: {e}")
+            return []
+
+    def _extract_article_links_from_soup(self, soup: BeautifulSoup, base_url: str) -> List[str]:
+        """Extract article links from BeautifulSoup object"""
+        links = []
+        domain = self._get_domain_name(base_url)
+
+        # Common article link selectors
+        link_selectors = [
+            'a[href*="/news/"]', 'a[href*="/article/"]', 'a[href*="/view/"]',
+            'a[href*="/read/"]', 'a[href*="/story/"]', '.article-link a',
+            '.news-link a', '.headline a', '.title a'
+        ]
+
+        for selector in link_selectors:
+            elements = soup.select(selector)
+            for element in elements:
+                href = element.get('href')
+                if href:
+                    # Convert to absolute URL
+                    if href.startswith('/'):
+                        full_url = f"https://{domain}{href}"
+                    elif href.startswith('http'):
+                        full_url = href
+                    else:
+                        continue
+
+                    # Basic filtering
+                    if self._is_article_url(full_url):
+                        links.append(full_url)
+
+        # Remove duplicates and limit
+        return list(set(links))[:20]
+
+    def _is_article_url(self, url: str) -> bool:
+        """Check if URL looks like an article"""
+        article_indicators = ['/news/', '/article/', '/view/', '/read/', '/story/']
+        skip_indicators = ['javascript:', 'mailto:', '#', '.css', '.js', '.jpg', '.png', '.gif']
+
+        return (any(indicator in url.lower() for indicator in article_indicators) and
+                not any(skip in url.lower() for skip in skip_indicators))
 
     def fetch_news_headlines(self, base_urls: List[str]) -> List[Dict[str, str]]:
         """Fetch headlines from news websites"""
@@ -193,56 +288,13 @@ class WebScraper:
 
         for base_url in base_urls:
             try:
-                result = self.fetch_url(base_url)
-
-                if result['success']:
-                    # Extract links that look like article URLs
-                    article_links = self._extract_article_links(result['content'], base_url)
-
-                    for link in article_links[:5]:  # Limit to 5 articles per site
-                        article_result = self.fetch_url(link)
-
-                        if article_result['success']:
-                            headlines.append({
-                                'title': article_result['title'],
-                                'content': article_result['content'][:500],  # First 500 chars
-                                'url': link,
-                                'source': self._get_domain_name(base_url)
-                            })
-
+                articles = self.scrape_news_site(base_url, max_articles=5)
+                headlines.extend(articles)
             except Exception as e:
                 print(f"Error fetching {base_url}: {e}")
                 continue
 
         return headlines
-
-    def _extract_article_links(self, html_content: str, base_url: str) -> List[str]:
-        """Extract article links from HTML content"""
-        links = []
-        domain = self._get_domain_name(base_url)
-
-        # Simple regex to find href attributes
-        href_pattern = r'href=["\']([^"\']+)["\']'
-        matches = re.findall(href_pattern, html_content)
-
-        for match in matches:
-            # Skip non-article URLs
-            if any(skip in match.lower() for skip in ['javascript:', 'mailto:', '#', 'css', 'js', 'img']):
-                continue
-
-            # Convert relative URLs to absolute
-            if match.startswith('/'):
-                link = f"https://{domain}{match}"
-            elif match.startswith('http'):
-                link = match
-            else:
-                continue
-
-            # Filter for article-like URLs
-            if any(indicator in match.lower() for indicator in ['article', 'news', 'story', '/view/', '/read/']):
-                links.append(link)
-
-        return list(set(links))  # Remove duplicates
 
     def _get_domain_name(self, url: str) -> str:
         """Extract domain name from URL"""
@@ -276,42 +328,39 @@ class WebScraper:
         return all_news
 
     def search_naver_news(self, query: str, max_results: int = 10) -> List[Dict]:
-        """Search Naver News (simple approach without API)"""
+        """Search Naver News using web scraping"""
         try:
             # Encode query for URL
             encoded_query = urllib.parse.quote(query)
             search_url = f"https://search.naver.com/search.naver?where=news&query={encoded_query}"
 
-            result = self.fetch_url(search_url)
+            response = self.session.get(search_url, timeout=15)
+            soup = BeautifulSoup(response.text, 'lxml')
 
-            if result['success']:
-                # Parse search results (simplified)
-                news_items = self._parse_naver_search_results(result['content'])
-                return news_items[:max_results]
+            news_items = []
+
+            # Find news articles in Naver search results
+            news_links = soup.select('.news_tit')  # Naver news title selector
+
+            for link_elem in news_links[:max_results]:
+                try:
+                    title = link_elem.get_text().strip()
+                    href = link_elem.get('href')
+
+                    if title and href and len(title) > 10:
+                        news_items.append({
+                            'title': title,
+                            'url': href,
+                            'source': 'Naver News'
+                        })
+                except Exception:
+                    continue
+
+            return news_items
 
         except Exception as e:
             print(f"Error searching Naver news for '{query}': {e}")
-
-        return []
-
-    def _parse_naver_search_results(self, html_content: str) -> List[Dict]:
-        """Parse Naver search results (simplified)"""
-        news_items = []
-
-        # Simple pattern to find news titles and links
-        # This is a basic implementation - real scraping would be more sophisticated
-        pattern = r'<a[^>]*href="([^"]*)"[^>]*>([^<]+)</a>'
-        matches = re.findall(pattern, html_content)
-
-        for link, title in matches:
-            if 'news.naver.com' in link and len(title.strip()) > 10:
-                news_items.append({
-                    'title': title.strip(),
-                    'link': link,
-                    'source': 'Naver News'
-                })
-
-        return news_items
+            return []
 
     def extract_trending_keywords(self, scraped_content: List[Dict]) -> List[Dict]:
         """Extract trending keywords from scraped content"""
@@ -370,15 +419,17 @@ def test_web_scraper():
 
         print("=== 웹 스크래퍼 테스트 ===")
 
-        # Test single URL
+        # Test single URL (the one mentioned in the critical issue)
         test_url = "https://www.mk.co.kr/news/realestate/"
         result = scraper.fetch_url(test_url)
 
         if result['success']:
-            print(f"Title: {result['title'][:50]}...")
-            print(f"Content length: {len(result['content'])} characters")
+            print(f"✅ SUCCESS - Title: {result['title'][:50]}...")
+            print(f"✅ Content length: {len(result['content'])} characters")
+            if len(result['content']) > 100:
+                print("✅ Content extraction working properly")
         else:
-            print(f"Error: {result.get('error', 'Unknown error')}")
+            print(f"❌ Error: {result.get('error', 'Unknown error')}")
 
         print("\n=== 뉴스 사이트 스크래핑 테스트 ===")
         news_data = scraper.scrape_korean_news_sites()
@@ -388,8 +439,14 @@ def test_web_scraper():
             if articles:
                 print(f"  Sample: {articles[0]['title'][:50]}...")
 
+        print("\n=== 개별 기사 스크래핑 테스트 ===")
+        articles = scraper.scrape_news_site("https://www.mk.co.kr/news/realestate/", max_articles=3)
+        print(f"Found {len(articles)} articles from mk.co.kr")
+        for i, article in enumerate(articles[:2]):
+            print(f"  {i+1}. {article['title'][:50]}... ({len(article['content'])} chars)")
+
     except Exception as e:
-        print(f"테스트 오류: {e}")
+        print(f"❌ 테스트 오류: {e}")
 
 
 if __name__ == "__main__":

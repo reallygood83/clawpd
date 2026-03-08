@@ -1,0 +1,10 @@
+{
+  "obsidian_vault": "/path/to/your/obsidian/vault",
+  "obsidian_plan_folder": "500-YouTube/기획안",
+  "obsidian_swot_folder": "500-YouTube/SWOT분석",
+  "auto_save_obsidian": true,
+  "share_note_enabled": false,
+  "language": "ko",
+  "default_video_length": 15,
+  "telegram_notify": true
+}

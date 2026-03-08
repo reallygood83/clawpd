@@ -1,0 +1,182 @@
+{
+  "niche": "부동산",
+  "description": "부동산 투자, 시장 분석, 매매 전략 전문 채널",
+
+  "default_sources": [
+    {
+      "name": "매일경제 부동산",
+      "url": "https://www.mk.co.kr/news/realestate/",
+      "type": "web",
+      "priority": "high",
+      "description": "부동산 시장 최신 뉴스"
+    },
+    {
+      "name": "한국경제 부동산",
+      "url": "https://www.hankyung.com/realestate",
+      "type": "web",
+      "priority": "high",
+      "description": "부동산 투자 전문 분석"
+    },
+    {
+      "name": "국토교통부 보도자료",
+      "url": "https://www.molit.go.kr/USR/NEWS/m_71/lst.jsp",
+      "type": "web",
+      "priority": "medium",
+      "description": "부동산 정책 발표"
+    },
+    {
+      "name": "부동산114",
+      "url": "https://www.r114.com",
+      "type": "web",
+      "priority": "medium",
+      "description": "부동산 시세 및 매물 정보"
+    },
+    {
+      "name": "네이버 부동산",
+      "url": "https://land.naver.com",
+      "type": "web",
+      "priority": "low",
+      "description": "부동산 시세 및 분석"
+    },
+    {
+      "name": "부동산스터디 카페",
+      "url": "https://cafe.naver.com/jaegebal",
+      "type": "naver_cafe",
+      "priority": "medium",
+      "description": "부동산 투자 커뮤니티"
+    },
+    {
+      "name": "청약홈",
+      "url": "https://www.applyhome.co.kr",
+      "type": "web",
+      "priority": "medium",
+      "description": "청약 일정 및 정보"
+    },
+    {
+      "name": "실거래가 공개시스템",
+      "url": "https://rt.molit.go.kr",
+      "type": "web",
+      "priority": "low",
+      "description": "실거래가 데이터"
+    }
+  ],
+
+  "keywords_seed": [
+    "부동산", "아파트", "재개발", "분양", "전세", "매매",
+    "청약", "금리", "GTX", "투자", "시세", "정책",
+    "대출", "세금", "수익률", "입지", "신도시", "역세권"
+  ],
+
+  "target_audience": {
+    "primary": "25-45세 부동산 관심 직장인",
+    "secondary": "부동산 투자자, 1인 가구, 신혼부부",
+    "characteristics": [
+      "안정적인 소득이 있는 직장인",
+      "내집마련이나 투자 목적",
+      "정확한 정보에 대한 높은 수요",
+      "시장 변화에 민감"
+    ]
+  },
+
+  "content_characteristics": {
+    "tone": "전문가 신뢰감 + 시의성 강조",
+    "typical_length": "12-18분",
+    "rpm_range": [3000, 7000],
+    "hook_style": "뉴스 속보 형태",
+    "preferred_format": "분석형 + 데이터 시각화"
+  },
+
+  "seo_templates": {
+    "title_patterns": [
+      "{topic} 지금 사면 안 되는 이유 (전문가 분석)",
+      "부동산 전문가가 알려주는 {topic} 핵심 포인트",
+      "{topic} 투자, 이것만은 꼭 알고 하세요",
+      "놓치면 후회하는 {topic} 최신 동향",
+      "{year} {topic} 전망 완벽 정리"
+    ],
+    "description_templates": [
+      "부동산 전문가가 분석하는 {topic}의 모든 것",
+      "투자 전 반드시 알아야 할 {topic} 핵심 정보",
+      "시장 데이터로 보는 {topic} 완벽 가이드"
+    ],
+    "common_tags": [
+      "부동산", "투자", "아파트", "시세", "전망",
+      "분석", "전문가", "정책", "금리", "세금"
+    ]
+  },
+
+  "content_angles": [
+    {
+      "angle": "시장 분석형",
+      "description": "최신 시장 데이터 기반 분석",
+      "use_case": "정책 발표, 시세 변동 시"
+    },
+    {
+      "angle": "투자 가이드형",
+      "description": "실전 투자 전략 및 노하우",
+      "use_case": "투자 관련 이슈 시"
+    },
+    {
+      "angle": "정책 해설형",
+      "description": "복잡한 정책을 쉽게 설명",
+      "use_case": "새로운 정책 발표 시"
+    },
+    {
+      "angle": "지역 분석형",
+      "description": "특정 지역 심층 분석",
+      "use_case": "개발 호재, 교통 이슈 시"
+    }
+  ],
+
+  "competitive_landscape": {
+    "top_competitors": [
+      "부동산읽어주는남자",
+      "월급쟁이부동산",
+      "집코노미",
+      "부동산정보통"
+    ],
+    "differentiation_opportunities": [
+      "실시간 데이터 활용",
+      "정책 해석의 정확성",
+      "지역별 세분화 분석",
+      "투자 수익률 계산"
+    ]
+  },
+
+  "trend_indicators": [
+    "금리 변동",
+    "정책 발표",
+    "분양 공고",
+    "재개발 소식",
+    "교통 인프라",
+    "경제 지표",
+    "청약 경쟁률",
+    "매매가 변동"
+  ],
+
+  "seasonal_content": {
+    "1월": "신년 부동산 전망",
+    "3월": "이사철 매매 시장",
+    "6월": "상반기 정책 평가",
+    "9월": "하반기 시장 전망",
+    "12월": "연말 세금 절약"
+  },
+
+  "performance_benchmarks": {
+    "excellent": {
+      "views_per_subscriber": 0.15,
+      "engagement_rate": 8.0,
+      "ctr": 12.0
+    },
+    "good": {
+      "views_per_subscriber": 0.08,
+      "engagement_rate": 5.0,
+      "ctr": 8.0
+    },
+    "average": {
+      "views_per_subscriber": 0.04,
+      "engagement_rate": 3.0,
+      "ctr": 5.0
+    }
+  }
+}

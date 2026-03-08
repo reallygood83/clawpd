@@ -1,0 +1,146 @@
+{
+  "niche": "사용자 정의",
+  "description": "사용자가 직접 설정하는 맞춤형 니치",
+
+  "default_sources": [
+    {
+      "name": "예시 소스 1",
+      "url": "https://example.com/rss",
+      "type": "rss",
+      "priority": "medium",
+      "description": "사용자가 추가할 소스 예시"
+    }
+  ],
+
+  "keywords_seed": [
+    "키워드1", "키워드2", "키워드3", "키워드4", "키워드5"
+  ],
+
+  "target_audience": {
+    "primary": "사용자 정의 타겟",
+    "secondary": "사용자 정의 보조 타겟",
+    "characteristics": [
+      "사용자가 정의할 특성 1",
+      "사용자가 정의할 특성 2",
+      "사용자가 정의할 특성 3"
+    ]
+  },
+
+  "content_characteristics": {
+    "tone": "사용자 정의 톤",
+    "typical_length": "10-15분",
+    "rpm_range": [1000, 5000],
+    "hook_style": "사용자 정의 스타일",
+    "preferred_format": "사용자 정의 포맷"
+  },
+
+  "seo_templates": {
+    "title_patterns": [
+      "{topic} 완벽 가이드",
+      "{topic}에 대해 알아야 할 모든 것",
+      "{topic} 전문가가 알려주는 비밀",
+      "{topic} 마스터하는 방법",
+      "{topic} 최신 트렌드"
+    ],
+    "description_templates": [
+      "{topic}에 대한 전문적인 분석과 가이드",
+      "실용적인 {topic} 정보를 제공합니다",
+      "{topic} 관련 최신 정보와 트렌드"
+    ],
+    "common_tags": [
+      "정보", "가이드", "분석", "트렌드", "전문"
+    ]
+  },
+
+  "content_angles": [
+    {
+      "angle": "정보 제공형",
+      "description": "유용한 정보를 체계적으로 제공",
+      "use_case": "새로운 정보나 뉴스가 있을 때"
+    },
+    {
+      "angle": "가이드 형",
+      "description": "단계별 방법이나 가이드 제공",
+      "use_case": "실용적인 방법론을 다룰 때"
+    },
+    {
+      "angle": "분석형",
+      "description": "심층적인 분석과 인사이트 제공",
+      "use_case": "복잡한 주제를 다룰 때"
+    },
+    {
+      "angle": "트렌드형",
+      "description": "최신 트렌드와 전망 제공",
+      "use_case": "변화하는 환경을 다룰 때"
+    }
+  ],
+
+  "competitive_landscape": {
+    "top_competitors": [
+      "경쟁사1",
+      "경쟁사2",
+      "경쟁사3"
+    ],
+    "differentiation_opportunities": [
+      "차별화 기회 1",
+      "차별화 기회 2",
+      "차별화 기회 3"
+    ]
+  },
+
+  "trend_indicators": [
+    "트렌드 지표 1",
+    "트렌드 지표 2",
+    "트렌드 지표 3",
+    "트렌드 지표 4"
+  ],
+
+  "seasonal_content": {
+    "1월": "신년 관련 콘텐츠",
+    "3월": "봄 시즌 콘텐츠",
+    "6월": "상반기 정리",
+    "9월": "하반기 전망",
+    "12월": "연말 마무리"
+  },
+
+  "performance_benchmarks": {
+    "excellent": {
+      "views_per_subscriber": 0.15,
+      "engagement_rate": 8.0,
+      "ctr": 10.0
+    },
+    "good": {
+      "views_per_subscriber": 0.08,
+      "engagement_rate": 5.0,
+      "ctr": 7.0
+    },
+    "average": {
+      "views_per_subscriber": 0.04,
+      "engagement_rate": 3.0,
+      "ctr": 4.0
+    }
+  },
+
+  "content_formats": [
+    {
+      "format": "표준 영상",
+      "description": "일반적인 콘텐츠 형태",
+      "optimal_length": "10-15분",
+      "engagement": "보통"
+    },
+    {
+      "format": "심화 분석",
+      "description": "깊이 있는 분석 콘텐츠",
+      "optimal_length": "15-25분",
+      "engagement": "높음"
+    },
+    {
+      "format": "빠른 정리",
+      "description": "핵심만 간단히",
+      "optimal_length": "5-8분",
+      "engagement": "높음"
+    }
+  ],
+
+  "customization_note": "이 프리셋은 사용자가 온보딩 과정에서 입력한 정보로 자동 업데이트됩니다. 필요에 따라 수동으로 수정하여 사용할 수 있습니다."
+}

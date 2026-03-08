@@ -1,0 +1,205 @@
+{
+  "welcome": {
+    "title": "🎬 YouTube PD Agent에 오신 것을 환영합니다!",
+    "description": "AI 기반 유튜브 콘텐츠 기획 에이전트입니다. 몇 가지 질문으로 채널을 분석하고 맞춤형 기획안을 생성해드립니다.",
+    "estimated_time": "약 5-10분 소요"
+  },
+
+  "questions": [
+    {
+      "id": "channel_url",
+      "type": "text",
+      "question": "📺 유튜브 채널 URL을 입력해주세요",
+      "placeholder": "예: https://www.youtube.com/@배움의달인",
+      "validation": {
+        "required": true,
+        "pattern": "(youtube\\.com|youtu\\.be)",
+        "error_message": "올바른 YouTube 채널 URL을 입력해주세요"
+      },
+      "help_text": "채널 홈페이지 URL을 복사해서 붙여넣어주세요. @username 형태도 가능합니다."
+    },
+
+    {
+      "id": "niche_category",
+      "type": "select",
+      "question": "🎯 채널의 주요 니치(전문 분야)는 무엇인가요?",
+      "options": [
+        { "value": "real_estate", "label": "부동산 / 투자", "description": "부동산 투자, 매매, 시장 분석" },
+        { "value": "tech_ai", "label": "테크 / AI", "description": "기술 트렌드, AI, 프로그래밍" },
+        { "value": "education", "label": "교육 / 학습", "description": "온라인 교육, 스킬 학습, 자기계발" },
+        { "value": "finance", "label": "주식 / 재테크", "description": "주식 투자, 재테크, 경제 분석" },
+        { "value": "business", "label": "비즈니스 / 창업", "description": "창업, 경영, 마케팅" },
+        { "value": "lifestyle", "label": "라이프스타일", "description": "일상, 여행, 취미" },
+        { "value": "custom", "label": "기타 / 직접 입력", "description": "위에 없는 특별한 분야" }
+      ],
+      "validation": {
+        "required": true
+      }
+    },
+
+    {
+      "id": "custom_niche",
+      "type": "text",
+      "question": "✏️ 구체적인 니치 분야를 설명해주세요",
+      "placeholder": "예: K-POP 댄스 커버, 반려동물 훈련, 요리 레시피 등",
+      "conditional": {
+        "show_if": {
+          "niche_category": "custom"
+        }
+      },
+      "validation": {
+        "required_if": "niche_category == custom",
+        "min_length": 2
+      }
+    },
+
+    {
+      "id": "target_audience",
+      "type": "text",
+      "question": "👥 주요 타겟 시청자는 누구인가요?",
+      "placeholder": "예: 20-30대 직장인, 부동산 투자 초보자, AI 개발자 등",
+      "validation": {
+        "required": true,
+        "min_length": 3
+      },
+      "help_text": "연령대, 직업, 관심사 등을 포함해서 설명해주세요."
+    },
+
+    {
+      "id": "content_tone",
+      "type": "select",
+      "question": "🎭 영상의 주요 톤앤매너는 어떤 스타일인가요?",
+      "options": [
+        { "value": "professional", "label": "전문가 / 신뢰형", "description": "정확한 정보, 전문적 분석, 신뢰감 중심" },
+        { "value": "friendly", "label": "친근한 / 교육형", "description": "쉬운 설명, 편안한 분위기, 접근성 중심" },
+        { "value": "trendy", "label": "트렌디 / 엔터테인먼트형", "description": "재미있는 편집, 트렌드 반영, 젊은 감각" },
+        { "value": "authoritative", "label": "권위적 / 리더십형", "description": "카리스마, 확신, 강한 주장" },
+        { "value": "casual", "label": "캐주얼 / 일상형", "description": "자연스러운 대화, 일상적 분위기" }
+      ],
+      "validation": {
+        "required": true
+      }
+    },
+
+    {
+      "id": "content_sources",
+      "type": "multitext",
+      "question": "📰 콘텐츠 소재를 주로 어디서 찾으시나요? (URL 입력)",
+      "placeholder": [
+        "예: https://www.mk.co.kr/news/realestate/",
+        "예: https://news.ycombinator.com/",
+        "예: https://cafe.naver.com/jaegebal"
+      ],
+      "max_items": 5,
+      "validation": {
+        "min_items": 1,
+        "url_format": true
+      },
+      "help_text": "뉴스 사이트, 블로그, RSS 피드, 네이버 카페 등의 URL을 입력해주세요. 최대 5개까지 등록 가능합니다."
+    },
+
+    {
+      "id": "keywords_seed",
+      "type": "tags",
+      "question": "🔑 채널의 핵심 키워드들을 입력해주세요",
+      "placeholder": "키워드 입력 후 Enter",
+      "max_tags": 10,
+      "validation": {
+        "min_tags": 3,
+        "max_tag_length": 20
+      },
+      "help_text": "채널에서 주로 다루는 주제의 핵심 키워드들을 입력해주세요. 콘텐츠 추천에 활용됩니다."
+    },
+
+    {
+      "id": "competitor_urls",
+      "type": "multitext",
+      "question": "🏆 참고하거나 벤치마킹하는 경쟁 채널이 있나요? (선택사항)",
+      "placeholder": [
+        "예: https://www.youtube.com/@부동산읽어주는남자",
+        "예: https://www.youtube.com/@월급쟁이부동산"
+      ],
+      "max_items": 5,
+      "validation": {
+        "required": false,
+        "youtube_url": true
+      },
+      "help_text": "유사한 분야의 채널이나 목표로 하는 채널 URL을 입력해주세요. SWOT 분석에 활용됩니다."
+    },
+
+    {
+      "id": "upload_schedule",
+      "type": "select",
+      "question": "📅 현재 업로드 주기는 어떻게 되나요?",
+      "options": [
+        { "value": "daily", "label": "매일", "description": "하루에 1개 이상" },
+        { "value": "every_other_day", "label": "이틀에 한 번", "description": "주 3-4회" },
+        { "value": "twice_weekly", "label": "주 2회", "description": "정기적으로 주 2회" },
+        { "value": "weekly", "label": "주 1회", "description": "매주 1개" },
+        { "value": "biweekly", "label": "2주에 1회", "description": "격주 업로드" },
+        { "value": "monthly", "label": "월 1-2회", "description": "가끔 업로드" },
+        { "value": "irregular", "label": "불규칙", "description": "정해진 스케줄 없음" }
+      ],
+      "validation": {
+        "required": true
+      }
+    },
+
+    {
+      "id": "goals",
+      "type": "multiselect",
+      "question": "🎯 YouTube PD Agent를 통해 달성하고 싶은 목표는 무엇인가요?",
+      "options": [
+        { "value": "increase_views", "label": "조회수 증가", "description": "영상 조회수 향상" },
+        { "value": "grow_subscribers", "label": "구독자 증가", "description": "채널 구독자 확대" },
+        { "value": "improve_engagement", "label": "참여도 개선", "description": "좋아요, 댓글 등 참여 증가" },
+        { "value": "content_planning", "label": "콘텐츠 기획", "description": "체계적인 콘텐츠 기획" },
+        { "value": "trend_analysis", "label": "트렌드 분석", "description": "실시간 트렌드 파악" },
+        { "value": "competitor_analysis", "label": "경쟁 분석", "description": "경쟁 채널 분석 및 전략 수립" },
+        { "value": "seo_optimization", "label": "SEO 최적화", "description": "검색 노출 개선" }
+      ],
+      "validation": {
+        "min_selections": 1,
+        "max_selections": 4
+      }
+    }
+  ],
+
+  "completion": {
+    "title": "🎉 설정 완료!",
+    "message": "YouTube PD Agent 설정이 완료되었습니다. 이제 AI가 분석한 데이터를 바탕으로 맞춤형 콘텐츠 기획안을 생성할 수 있습니다.",
+    "next_steps": [
+      "📊 `/기획` - 이번 주 추천 콘텐츠 기획안 생성",
+      "🔍 `/swot [경쟁채널URL]` - 경쟁채널 SWOT 분석",
+      "⚙️ `/소스관리` - 정보 소스 추가/관리"
+    ]
+  },
+
+  "presets": {
+    "real_estate": {
+      "default_sources": [
+        "https://www.mk.co.kr/news/realestate/",
+        "https://www.hankyung.com/realestate",
+        "https://www.molit.go.kr/USR/NEWS/m_71/lst.jsp"
+      ],
+      "keywords_seed": ["부동산", "아파트", "재개발", "분양", "전세", "매매", "청약", "금리", "GTX"],
+      "typical_audience": "25-45세 부동산 관심 직장인, 투자자, 1인 가구"
+    },
+    "tech_ai": {
+      "default_sources": [
+        "https://news.ycombinator.com/rss",
+        "https://www.aitimes.com",
+        "https://techcrunch.com/feed/"
+      ],
+      "keywords_seed": ["AI", "ChatGPT", "Claude", "에이전트", "자동화", "프로그래밍"],
+      "typical_audience": "20-40세 개발자, IT 직장인, 기술 얼리어답터"
+    },
+    "education": {
+      "default_sources": [
+        "https://www.edutopia.org/rss.xml"
+      ],
+      "keywords_seed": ["교육", "학습", "온라인강의", "스킬", "자기계발", "공부법"],
+      "typical_audience": "학생, 직장인, 평생학습자"
+    }
+  }
+}

@@ -1,0 +1,62 @@
+# YouTube PD Agent Dependencies
+# Core requirements for full functionality
+
+# YouTube Data API client
+google-api-python-client>=2.100.0
+
+# RSS/Atom feed parsing
+feedparser>=6.0.10
+
+# Web scraping and HTML parsing
+beautifulsoup4>=4.12.2
+lxml>=4.9.3
+
+# HTTP requests
+requests>=2.31.0
+urllib3>=2.0.4
+
+# JSON/Data handling
+python-dateutil>=2.8.2
+
+# Text processing and NLP
+re>=2023.6.3  # Built-in, but listing for clarity
+
+# Logging and configuration
+python-dotenv>=1.0.0  # For .env file support
+
+# Optional: Enhanced performance (comment out if not needed)
+# aiohttp>=3.8.5        # For async HTTP requests
+# asyncio>=3.11.0       # For concurrent operations
+
+# Development and testing (comment out for production)
+# pytest>=7.4.0
+# black>=23.7.0
+# flake8>=6.0.0
+
+# Note: The following are optional and require API keys:
+# - XAI Python SDK (for Grok/X integration)
+# - Naver API client (for Korean content)
+# - Cerebras API client (for free LLM preprocessing)
+
+# For XAI integration (optional)
+# xai>=0.1.0
+
+# For advanced text analysis (optional)
+# nltk>=3.8.1
+# textblob>=0.17.1
+
+# System requirements:
+# Python 3.10 or higher
+# 4GB RAM recommended
+# 500MB disk space
+# Stable internet connection
+
+# Environment variables needed:
+# YOUTUBE_API_KEY (required) - Get from Google Cloud Console
+# XAI_API_KEY (optional) - For Grok/X real-time trends
+# NAVER_CLIENT_ID (optional) - For Naver search enhancement
+# NAVER_CLIENT_SECRET (optional) - For Naver search enhancement
+# CEREBRAS_API_KEY (optional) - For free LLM preprocessing
+
+# Installation:
+# pip install -r requirements.txt

@@ -1,0 +1,210 @@
+{
+  "niche": "AI/테크",
+  "description": "AI, 기술 트렌드, 프로그래밍, 생산성 도구 전문 채널",
+
+  "default_sources": [
+    {
+      "name": "Hacker News RSS",
+      "url": "https://news.ycombinator.com/rss",
+      "type": "rss",
+      "priority": "high",
+      "description": "최신 기술 뉴스와 트렌드"
+    },
+    {
+      "name": "AI Times",
+      "url": "https://www.aitimes.com",
+      "type": "web",
+      "priority": "high",
+      "description": "AI 전문 뉴스 사이트"
+    },
+    {
+      "name": "TechCrunch",
+      "url": "https://techcrunch.com/feed/",
+      "type": "rss",
+      "priority": "high",
+      "description": "글로벌 테크 뉴스"
+    },
+    {
+      "name": "OpenAI Blog",
+      "url": "https://openai.com/blog/rss.xml",
+      "type": "rss",
+      "priority": "medium",
+      "description": "OpenAI 공식 업데이트"
+    },
+    {
+      "name": "Anthropic Blog",
+      "url": "https://www.anthropic.com/research",
+      "type": "web",
+      "priority": "medium",
+      "description": "Claude 개발사 연구 블로그"
+    },
+    {
+      "name": "GitHub Trending",
+      "url": "https://github.com/trending",
+      "type": "web",
+      "priority": "medium",
+      "description": "트렌딩 오픈소스 프로젝트"
+    },
+    {
+      "name": "Product Hunt",
+      "url": "https://www.producthunt.com",
+      "type": "web",
+      "priority": "low",
+      "description": "신제품 및 도구 발견"
+    }
+  ],
+
+  "keywords_seed": [
+    "AI", "ChatGPT", "Claude", "GPT", "LLM", "에이전트",
+    "자동화", "프로그래밍", "코딩", "개발", "머신러닝",
+    "딥러닝", "옵시디언", "노션", "생산성", "워크플로우",
+    "API", "오픈소스", "파이썬", "자바스크립트"
+  ],
+
+  "target_audience": {
+    "primary": "20-40세 개발자, IT 직장인",
+    "secondary": "기술 얼리어답터, 대학생, 창업가",
+    "characteristics": [
+      "새로운 기술에 관심이 높음",
+      "실무에 바로 적용 가능한 정보 선호",
+      "영어 콘텐츠에도 거부감 없음",
+      "커뮤니티 활동 활발"
+    ]
+  },
+
+  "content_characteristics": {
+    "tone": "친근한 교육자 + 실전 데모",
+    "typical_length": "10-15분",
+    "rpm_range": [5000, 13000],
+    "hook_style": "놀라운 발견 형태",
+    "preferred_format": "튜토리얼 + 라이브 데모"
+  },
+
+  "seo_templates": {
+    "title_patterns": [
+      "{topic} 이거 모르면 큰일납니다 (2024 최신)",
+      "개발자가 알려주는 {topic} 완벽 가이드",
+      "{topic} 5분 만에 마스터하기",
+      "이제는 {topic} 시대! 바로 써보세요",
+      "{topic} vs {alternative} 뭘 써야 할까?"
+    ],
+    "description_templates": [
+      "{topic}를 실무에서 바로 활용하는 방법",
+      "개발자 관점에서 본 {topic}의 모든 것",
+      "초보자도 쉽게 따라할 수 있는 {topic} 가이드"
+    ],
+    "common_tags": [
+      "AI", "개발", "프로그래밍", "코딩", "자동화",
+      "생산성", "튜토리얼", "가이드", "최신기술", "트렌드"
+    ]
+  },
+
+  "content_angles": [
+    {
+      "angle": "실무 적용형",
+      "description": "실제 업무에서 바로 사용할 수 있는 방법",
+      "use_case": "새로운 도구나 기술 출시 시"
+    },
+    {
+      "angle": "비교 분석형",
+      "description": "여러 도구나 기술을 비교 분석",
+      "use_case": "유사한 서비스가 많을 때"
+    },
+    {
+      "angle": "트렌드 예측형",
+      "description": "기술 발전 방향과 미래 전망",
+      "use_case": "산업 변화나 새로운 발표 시"
+    },
+    {
+      "angle": "초보자 가이드형",
+      "description": "복잡한 기술을 쉽게 설명",
+      "use_case": "새로운 개념이나 도구 소개 시"
+    }
+  ],
+
+  "competitive_landscape": {
+    "top_competitors": [
+      "조코딩",
+      "드림코딩",
+      "코딩애플",
+      "노마드코더"
+    ],
+    "differentiation_opportunities": [
+      "최신 AI 도구 빠른 리뷰",
+      "실무 중심 활용법",
+      "한국어 튜토리얼 부족 영역",
+      "생산성 워크플로우 제안"
+    ]
+  },
+
+  "trend_indicators": [
+    "새로운 AI 모델 출시",
+    "오픈소스 프로젝트 인기",
+    "테크 컨퍼런스 발표",
+    "스타트업 펀딩 뉴스",
+    "개발자 설문조사",
+    "GitHub 트렌딩",
+    "API 업데이트",
+    "보안 이슈"
+  ],
+
+  "seasonal_content": {
+    "1월": "새해 개발 트렌드 예측",
+    "3월": "개발자 채용 시즌 대비",
+    "6월": "상반기 기술 정리",
+    "9월": "하반기 신기술 전망",
+    "12월": "올해의 개발 도구 TOP 10"
+  },
+
+  "performance_benchmarks": {
+    "excellent": {
+      "views_per_subscriber": 0.20,
+      "engagement_rate": 12.0,
+      "ctr": 15.0
+    },
+    "good": {
+      "views_per_subscriber": 0.12,
+      "engagement_rate": 8.0,
+      "ctr": 10.0
+    },
+    "average": {
+      "views_per_subscriber": 0.06,
+      "engagement_rate": 5.0,
+      "ctr": 6.0
+    }
+  },
+
+  "content_formats": [
+    {
+      "format": "Live Coding",
+      "description": "실시간 코딩 과정 시연",
+      "optimal_length": "20-30분",
+      "engagement": "매우 높음"
+    },
+    {
+      "format": "Quick Tutorial",
+      "description": "5-10분 빠른 팁",
+      "optimal_length": "5-8분",
+      "engagement": "높음"
+    },
+    {
+      "format": "Deep Dive",
+      "description": "심화 분석 및 설명",
+      "optimal_length": "15-25분",
+      "engagement": "보통"
+    },
+    {
+      "format": "News Roundup",
+      "description": "주간 기술 뉴스 정리",
+      "optimal_length": "12-18분",
+      "engagement": "보통"
+    }
+  ],
+
+  "collaboration_opportunities": [
+    "개발자 커뮤니티 연계",
+    "오픈소스 프로젝트 기여자 인터뷰",
+    "스타트업 창업가 대담",
+    "해외 개발자와 영상 제작"
+  ]
+}

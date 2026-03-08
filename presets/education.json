@@ -1,0 +1,218 @@
+{
+  "niche": "교육",
+  "description": "온라인 교육, 스킬 학습, 자기계발, 학습법 전문 채널",
+
+  "default_sources": [
+    {
+      "name": "에듀테크 뉴스",
+      "url": "https://www.edtechmagazine.com/k12/rss.xml",
+      "type": "rss",
+      "priority": "high",
+      "description": "교육 기술 최신 동향"
+    },
+    {
+      "name": "교육부 보도자료",
+      "url": "https://www.moe.go.kr/boardCnts/list.do?boardID=294&m=02&s=moe",
+      "type": "web",
+      "priority": "medium",
+      "description": "교육 정책 발표"
+    },
+    {
+      "name": "Coursera Blog",
+      "url": "https://blog.coursera.org/feed/",
+      "type": "rss",
+      "priority": "medium",
+      "description": "온라인 교육 트렌드"
+    },
+    {
+      "name": "Udemy Blog",
+      "url": "https://blog.udemy.com/feed/",
+      "type": "rss",
+      "priority": "medium",
+      "description": "스킬 학습 가이드"
+    },
+    {
+      "name": "Khan Academy Blog",
+      "url": "https://blog.khanacademy.org/feed/",
+      "type": "rss",
+      "priority": "low",
+      "description": "무료 교육 콘텐츠"
+    },
+    {
+      "name": "학습법 커뮤니티",
+      "url": "https://cafe.naver.com/studymethod",
+      "type": "naver_cafe",
+      "priority": "medium",
+      "description": "학습자들의 경험 공유"
+    }
+  ],
+
+  "keywords_seed": [
+    "교육", "학습", "온라인강의", "스킬", "자기계발",
+    "공부법", "암기법", "집중력", "효율성", "생산성",
+    "시간관리", "목표설정", "습관", "동기부여", "성장",
+    "독서", "언어학습", "자격증", "취업준비"
+  ],
+
+  "target_audience": {
+    "primary": "학생, 직장인, 평생학습자",
+    "secondary": "학부모, 교육자, 자기계발 관심자",
+    "characteristics": [
+      "학습 효율성에 관심 높음",
+      "실용적인 방법론 선호",
+      "성과 측정 가능한 방법 추구",
+      "시간 부족으로 인한 효율 중시"
+    ]
+  },
+
+  "content_characteristics": {
+    "tone": "친근한 멘토 + 실증적 근거",
+    "typical_length": "8-15분",
+    "rpm_range": [2000, 6000],
+    "hook_style": "문제 해결 약속형",
+    "preferred_format": "실습 가이드 + 경험 공유"
+  },
+
+  "seo_templates": {
+    "title_patterns": [
+      "{topic} 10배 빠르게 마스터하는 법",
+      "공부 잘하는 사람들의 {topic} 비밀",
+      "{topic} 효율적으로 공부하는 3가지 방법",
+      "직장인을 위한 {topic} 완벽 가이드",
+      "{topic} 이렇게 하면 누구나 성공합니다"
+    ],
+    "description_templates": [
+      "효과적인 {topic} 학습법을 단계별로 알려드립니다",
+      "실제로 검증된 {topic} 공부 방법",
+      "바쁜 직장인도 할 수 있는 {topic} 전략"
+    ],
+    "common_tags": [
+      "교육", "학습", "공부법", "스킬", "자기계발",
+      "효율", "가이드", "방법", "전략", "성장"
+    ]
+  },
+
+  "content_angles": [
+    {
+      "angle": "학습법 가이드형",
+      "description": "과학적 근거 기반 학습 방법론",
+      "use_case": "새로운 학습 연구 결과 발표 시"
+    },
+    {
+      "angle": "실전 경험형",
+      "description": "실제 성공 사례와 노하우 공유",
+      "use_case": "개인 경험이나 인터뷰 소재 시"
+    },
+    {
+      "angle": "도구 활용형",
+      "description": "학습 도구나 앱 사용법",
+      "use_case": "새로운 교육 도구 출시 시"
+    },
+    {
+      "angle": "동기부여형",
+      "description": "학습 동기와 마인드셋 개선",
+      "use_case": "새학기, 새해 등 시기적 타이밍"
+    }
+  ],
+
+  "competitive_landscape": {
+    "top_competitors": [
+      "공부의신",
+      "스터디윗미",
+      "배움의달인",
+      "자기계발TV"
+    ],
+    "differentiation_opportunities": [
+      "과학적 근거 기반 방법론",
+      "개인화된 학습 전략",
+      "직장인 특화 콘텐츠",
+      "실습 중심 구성"
+    ]
+  },
+
+  "trend_indicators": [
+    "새로운 교육 연구 발표",
+    "학습 도구 트렌드",
+    "자격증 시험 변화",
+    "채용 트렌드 변화",
+    "온라인 교육 플랫폼 업데이트",
+    "학습법 관련 도서 출간",
+    "교육 정책 변화",
+    "뇌과학 연구 결과"
+  ],
+
+  "seasonal_content": {
+    "1월": "새해 학습 목표 설정",
+    "2월": "새학기 준비",
+    "6월": "중간고사 대비 전략",
+    "8월": "여름휴가 활용법",
+    "9월": "하반기 자격증 준비",
+    "11월": "연말 마무리 학습"
+  },
+
+  "performance_benchmarks": {
+    "excellent": {
+      "views_per_subscriber": 0.18,
+      "engagement_rate": 10.0,
+      "ctr": 12.0
+    },
+    "good": {
+      "views_per_subscriber": 0.10,
+      "engagement_rate": 6.0,
+      "ctr": 8.0
+    },
+    "average": {
+      "views_per_subscriber": 0.05,
+      "engagement_rate": 4.0,
+      "ctr": 5.0
+    }
+  },
+
+  "content_formats": [
+    {
+      "format": "Step-by-Step Guide",
+      "description": "단계별 상세 가이드",
+      "optimal_length": "12-18분",
+      "engagement": "높음"
+    },
+    {
+      "format": "Quick Tips",
+      "description": "즉시 적용 가능한 팁",
+      "optimal_length": "5-8분",
+      "engagement": "매우 높음"
+    },
+    {
+      "format": "Case Study",
+      "description": "성공/실패 사례 분석",
+      "optimal_length": "15-25분",
+      "engagement": "보통"
+    },
+    {
+      "format": "Q&A",
+      "description": "시청자 질문 답변",
+      "optimal_length": "10-15분",
+      "engagement": "높음"
+    }
+  ],
+
+  "engagement_strategies": [
+    "학습 챌린지 진행",
+    "스터디 그룹 연계",
+    "학습 성과 인증",
+    "멘토링 프로그램"
+  ],
+
+  "monetization_opportunities": [
+    "유료 강의 제작",
+    "학습 플래너 판매",
+    "1:1 코칭 서비스",
+    "스터디 그룹 운영"
+  ],
+
+  "collaboration_opportunities": [
+    "교육 전문가 인터뷰",
+    "성공한 학습자 사례 공유",
+    "교육 기업과 파트너십",
+    "동일 분야 크리에이터 협업"
+  ]
+}

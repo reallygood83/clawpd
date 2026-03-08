@@ -1,0 +1,763 @@
+"""
+Plan Generator - Creates comprehensive PD-level YouTube content plans
+Generates cue sheets, full scripts, thumbnails, SEO packages, and shooting guides
+"""
+
+import json
+import logging
+import os
+from datetime import datetime
+from typing import Dict, List, Optional, Any
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+class PlanGenerator:
+    """Generate comprehensive YouTube content plans at PD level."""
+
+    def __init__(self, data_dir: str = "data", templates_dir: str = "templates"):
+        """Initialize the plan generator."""
+        self.data_dir = data_dir
+        self.templates_dir = templates_dir
+
+        # Load configurations
+        self.channel_profile = self._load_channel_profile()
+        self.plan_template = self._load_plan_template()
+
+    def _load_channel_profile(self) -> Dict[str, Any]:
+        """Load channel profile configuration."""
+        try:
+            profile_file = os.path.join(self.data_dir, "channel_profile.json")
+            if os.path.exists(profile_file):
+                with open(profile_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            return {}
+        except Exception as e:
+            logger.error(f"Error loading channel profile: {e}")
+            return {}
+
+    def _load_plan_template(self) -> str:
+        """Load the PD plan template."""
+        try:
+            template_file = os.path.join(self.templates_dir, "pd_plan.md")
+            if os.path.exists(template_file):
+                with open(template_file, 'r', encoding='utf-8') as f:
+                    return f.read()
+            return self._get_default_template()
+        except Exception as e:
+            logger.error(f"Error loading plan template: {e}")
+            return self._get_default_template()
+
+    def _get_default_template(self) -> str:
+        """Get default plan template if file doesn't exist."""
+        return """# 🎬 [PD급 기획안] {title}
+
+## 📊 1. 기획 의도 + 데이터 근거
+
+### 트렌드 분석
+- **주제**: {topic}
+- **트렌드 스코어**: {trend_score}/10
+- **검색 수요**: {search_demand}
+- **시의성**: {timeliness}
+- **소스 근거**: {sources}
+
+### 채널 적합도
+- **니치 매칭**: {niche_match}
+- **타겟 관심도**: {target_interest}
+- **예상 성과**: {performance_estimate}
+
+### 경쟁 분석
+- **동일 주제 영상 수**: {competitor_count}
+- **상위 영상 평균 조회수**: {avg_competitor_views}
+- **차별화 포인트**: {differentiation}
+
+---
+
+## 🎯 2. 초 단위 큐시트 ({duration}분)
+
+{cue_sheet}
+
+---
+
+## 📝 3. 전체 대본 초안
+
+{full_script}
+
+---
+
+## 🎨 4. 썸네일 시안 3종
+
+{thumbnail_designs}
+
+---
+
+## 🎬 5. 촬영 가이드
+
+{shooting_guide}
+
+---
+
+## 🔍 6. SEO 패키지
+
+{seo_package}
+
+---
+
+## 📈 7. 예상 성과
+
+{performance_metrics}
+
+---
+
+## 🚀 8. 경쟁 차별화 전략
+
+{competitive_strategy}
+
+---
+
+*생성일: {generated_date}*
+*기획자: YouTube PD Agent v1.0*
+"""
+
+    def generate_comprehensive_plan(self, recommendation: Dict[str, Any],
+                                   additional_context: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Generate a comprehensive PD-level content plan."""
+        try:
+            logger.info(f"Generating comprehensive plan for: {recommendation.get('topic', 'Unknown')}")
+
+            # Extract basic information
+            topic = recommendation.get("topic", "")
+            content_angle = recommendation.get("content_angle", "")
+
+            # Generate all plan components
+            plan_data = {
+                "title": self._generate_title_options(topic, content_angle),
+                "topic": topic,
+                "content_angle": content_angle,
+                "trend_score": recommendation.get("trend_score", 0),
+                "search_demand": self._format_search_demand(recommendation.get("search_demand", 0)),
+                "timeliness": self._assess_timeliness(recommendation),
+                "sources": self._format_sources(recommendation.get("sources", [])),
+                "niche_match": self._assess_niche_match(recommendation),
+                "target_interest": self._assess_target_interest(recommendation),
+                "performance_estimate": self._format_performance_estimate(recommendation.get("performance_estimate", {})),
+                "competitor_count": self._estimate_competitor_count(topic),
+                "avg_competitor_views": self._estimate_competitor_views(topic),
+                "differentiation": self._generate_differentiation_points(topic, content_angle),
+                "duration": self._suggest_video_duration(recommendation),
+                "cue_sheet": self._generate_cue_sheet(topic, content_angle, recommendation),
+                "full_script": self._generate_full_script(topic, content_angle, recommendation),
+                "thumbnail_designs": self._generate_thumbnail_designs(topic, content_angle),
+                "shooting_guide": self._generate_shooting_guide(recommendation),
+                "seo_package": self._generate_seo_package(topic, content_angle, recommendation),
+                "performance_metrics": self._generate_performance_metrics(recommendation),
+                "competitive_strategy": self._generate_competitive_strategy(topic, recommendation),
+                "generated_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+
+            # Fill template
+            plan_content = self.plan_template.format(**plan_data)
+
+            # Save plan
+            plan_id = self._save_plan(plan_content, topic)
+
+            result = {
+                "success": True,
+                "plan_id": plan_id,
+                "plan_content": plan_content,
+                "plan_data": plan_data,
+                "file_path": os.path.join(self.data_dir, "plan_history", f"{plan_id}.md"),
+                "summary": {
+                    "topic": topic,
+                    "title_options": plan_data["title"],
+                    "estimated_views": plan_data["performance_estimate"].get("estimated_views", 0),
+                    "confidence": plan_data["performance_estimate"].get("confidence", "보통"),
+                    "timeline": recommendation.get("recommended_timeline", "1주일 내")
+                }
+            }
+
+            logger.info(f"Plan generated successfully: {plan_id}")
+            return result
+
+        except Exception as e:
+            logger.error(f"Error generating comprehensive plan: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "plan_content": "",
+                "plan_data": {}
+            }
+
+    def _generate_title_options(self, topic: str, content_angle: str) -> List[Dict[str, str]]:
+        """Generate multiple title options with SEO strategies."""
+        try:
+            channel_niche = self.channel_profile.get("detected_niche", "").lower()
+
+            titles = []
+
+            # Title option 1: Direct and urgent
+            title1 = f"🔥 {topic} 지금 주목해야 하는 이유 (놓치면 후회)"
+            titles.append({
+                "title": title1,
+                "strategy": "긴급성 + 감정적 호소",
+                "target_ctr": "8-12%"
+            })
+
+            # Title option 2: Expert authority
+            if "부동산" in channel_niche:
+                title2 = f"부동산 전문가가 알려주는 {topic} 핵심 포인트 BEST 5"
+            elif "ai" in channel_niche or "테크" in channel_niche:
+                title2 = f"AI 전문가가 분석한 {topic} 완벽 가이드"
+            else:
+                title2 = f"전문가가 직접 분석한 {topic} 핵심 정리"
+
+            titles.append({
+                "title": title2,
+                "strategy": "권위성 + 구조화된 정보",
+                "target_ctr": "6-9%"
+            })
+
+            # Title option 3: Trend and timing
+            current_year = datetime.now().year
+            title3 = f"{current_year} {topic} 트렌드 총정리 | 지금 알아야 할 모든 것"
+            titles.append({
+                "title": title3,
+                "strategy": "최신성 + 포괄성",
+                "target_ctr": "5-8%"
+            })
+
+            return titles
+
+        except Exception as e:
+            logger.error(f"Error generating title options: {e}")
+            return [{"title": f"{topic} 완벽 분석", "strategy": "기본형", "target_ctr": "4-6%"}]
+
+    def _format_search_demand(self, demand_score: float) -> str:
+        """Format search demand score into readable text."""
+        if demand_score >= 4.0:
+            return f"높음 (스코어: {demand_score:.1f}) - YouTube 자동완성 상위 등장"
+        elif demand_score >= 2.5:
+            return f"보통 (스코어: {demand_score:.1f}) - 검색 수요 확인"
+        else:
+            return f"낮음 (스코어: {demand_score:.1f}) - 니치 키워드"
+
+    def _assess_timeliness(self, recommendation: Dict[str, Any]) -> str:
+        """Assess the timeliness of the topic."""
+        recency = recommendation.get("recency", 0)
+
+        if recency >= 8:
+            return "매우 높음 - 24시간 내 핫이슈"
+        elif recency >= 5:
+            return "높음 - 최근 3일 내 화제"
+        elif recency >= 3:
+            return "보통 - 1주일 내 관심 증가"
+        else:
+            return "낮음 - 지속적 관심 주제"
+
+    def _format_sources(self, sources: List[str]) -> str:
+        """Format source list into readable text."""
+        if not sources:
+            return "내부 트렌드 분석"
+
+        return ", ".join(sources[:3]) + (f" 외 {len(sources)-3}개" if len(sources) > 3 else "")
+
+    def _assess_niche_match(self, recommendation: Dict[str, Any]) -> str:
+        """Assess how well the topic matches the channel niche."""
+        relevance_score = recommendation.get("channel_relevance", 1)
+
+        if relevance_score >= 4.0:
+            return f"완벽 매치 ({relevance_score:.1f}/5.0) - 채널 핵심 키워드 일치"
+        elif relevance_score >= 3.0:
+            return f"높은 적합도 ({relevance_score:.1f}/5.0) - 채널 니치와 연관성 높음"
+        elif relevance_score >= 2.0:
+            return f"보통 적합도 ({relevance_score:.1f}/5.0) - 부분적 연관성"
+        else:
+            return f"낮은 적합도 ({relevance_score:.1f}/5.0) - 새로운 영역 도전"
+
+    def _assess_target_interest(self, recommendation: Dict[str, Any]) -> str:
+        """Assess target audience interest level."""
+        # Combine multiple factors
+        trend_score = recommendation.get("trend_score", 0)
+        demand_score = recommendation.get("search_demand", 0)
+
+        combined_score = (trend_score + demand_score) / 2
+
+        if combined_score >= 7:
+            return "매우 높음 - 타겟 오디언스 핫 키워드"
+        elif combined_score >= 5:
+            return "높음 - 관심 증가 중인 주제"
+        elif combined_score >= 3:
+            return "보통 - 기본 관심 수준"
+        else:
+            return "낮음 - 니치 관심 주제"
+
+    def _format_performance_estimate(self, performance: Dict[str, Any]) -> Dict[str, Any]:
+        """Format performance estimate data."""
+        if not performance:
+            return {
+                "estimated_views": "정보 부족",
+                "confidence": "보통",
+                "reasoning": "분석 데이터 부족"
+            }
+
+        return performance
+
+    def _suggest_video_duration(self, recommendation: Dict[str, Any]) -> int:
+        """Suggest optimal video duration based on content type."""
+        topic = recommendation.get("topic", "").lower()
+        content_format = recommendation.get("content_format", "").lower()
+
+        # Duration based on content type
+        if "뉴스" in content_format or "속보" in topic:
+            return 10  # 8-12 minutes for news
+        elif "가이드" in content_format or "튜토리얼" in topic:
+            return 18  # 15-25 minutes for guides
+        elif "분석" in content_format:
+            return 15  # 12-18 minutes for analysis
+        else:
+            return 12  # 10-15 minutes default
+
+    def _generate_cue_sheet(self, topic: str, content_angle: str, recommendation: Dict[str, Any]) -> str:
+        """Generate second-by-second cue sheet."""
+        try:
+            duration_minutes = self._suggest_video_duration(recommendation)
+            total_seconds = duration_minutes * 60
+
+            # Basic cue sheet structure
+            cue_sheet = []
+
+            # Hook (0-15 seconds)
+            cue_sheet.append("""### 🎣 훅 (0:00-0:15)
+**카메라**: 클로즈업 → 미디엄 샷
+**멘트**: "오늘 이 영상 못 보면 정말 후회하실 겁니다"
+**B-roll**: 핫이슈 관련 뉴스 헤드라인
+**그래픽**: 긴급 속보 스타일 자막
+**BGM**: 임팩트 있는 인트로 음악 (90% 볼륨)""")
+
+            # Problem setup (15-45 seconds)
+            cue_sheet.append(f"""### ⚡ 문제 제기 (0:15-0:45)
+**카메라**: 미디엄 샷 유지
+**멘트**: "{topic}에 대해 다들 궁금해하시는데, 정작 정확한 정보는 어디서도 찾기 어렵죠?"
+**B-roll**: 관련 뉴스 클립 몽타주
+**그래픽**: 핵심 키워드 강조 텍스트
+**BGM**: 긴장감 있는 배경음악 (70% 볼륨)""")
+
+            # Content introduction (45-90 seconds)
+            cue_sheet.append(f"""### 📋 목차 소개 (0:45-1:30)
+**카메라**: 와이드 샷 → 미디엄 샷
+**멘트**: "오늘 영상에서는 {topic}에 대한 핵심 포인트 5가지를 정리해드리겠습니다"
+**B-roll**: 목차 관련 B-roll 소재
+**그래픽**: 애니메이션 목차 (1,2,3,4,5)
+**BGM**: 업비트 배경음악 (60% 볼륨)""")
+
+            # Main content sections
+            main_duration = total_seconds - 180  # Minus intro/outro
+            section_duration = main_duration // 5  # 5 main points
+
+            for i in range(1, 6):
+                start_time = 90 + (i-1) * section_duration
+                end_time = start_time + section_duration
+                start_min = start_time // 60
+                start_sec = start_time % 60
+                end_min = end_time // 60
+                end_sec = end_time % 60
+
+                cue_sheet.append(f"""### 📌 핵심 포인트 {i} ({start_min}:{start_sec:02d}-{end_min}:{end_sec:02d})
+**카메라**: 미디엄 샷, 제스처 강조
+**멘트**: "{i}번째 포인트는 [구체적 내용]입니다"
+**B-roll**: 포인트 관련 시각적 자료
+**그래픽**: 포인트 {i} 타이틀 + 핵심 내용
+**BGM**: 설명용 배경음악 (50% 볼륨)
+**추가 요소**: 화면 분할로 데이터/차트 표시""")
+
+            # Conclusion
+            outro_start = total_seconds - 60
+            outro_min = outro_start // 60
+            outro_sec = outro_start % 60
+
+            cue_sheet.append(f"""### 🎯 마무리 ({"{}:{}".format(outro_min, outro_sec):02d}-{duration_minutes}:00)
+**카메라**: 클로즈업 → 와이드 샷
+**멘트**: "오늘 {topic}에 대해 정리해봤는데, 어떠셨나요?"
+**B-roll**: 핵심 내용 요약 몽타주
+**그래픽**: 구독/좋아요 애니메이션
+**BGM**: 마무리 음악 (70% → fade out)
+**CTA**: "구독과 좋아요, 그리고 댓글로 의견 남겨주세요!"
+**엔드스크린**: 관련 영상 2개 추천""")
+
+            return "\n\n".join(cue_sheet)
+
+        except Exception as e:
+            logger.error(f"Error generating cue sheet: {e}")
+            return f"**큐시트 생성 중 오류 발생**: {str(e)}"
+
+    def _generate_full_script(self, topic: str, content_angle: str, recommendation: Dict[str, Any]) -> str:
+        """Generate full video script."""
+        try:
+            niche = self.channel_profile.get("detected_niche", "")
+            tone = self.channel_profile.get("detected_tone", "친근한")
+
+            script_sections = []
+
+            # Intro
+            script_sections.append(f"""### 인트로
+안녕하세요, [채널명]입니다!
+
+오늘은 정말 중요한 이야기를 가져왔어요. {topic}에 대해서 말이죠.
+
+최근에 이 주제로 정말 많은 분들이 궁금해하시는데, 정작 정확하고 신뢰할 만한 정보는 찾기 어려우셨을 거예요.
+
+그래서 오늘 제가 직접 전문 자료들을 모두 분석해서, 여러분이 꼭 알아야 할 핵심만 정리해드리려고 합니다.
+
+이 영상 끝까지 보시면 {topic}에 대해 완전히 정리가 되실 거예요. 바로 시작할게요!""")
+
+            # Main content
+            script_sections.append(f"""### 메인 콘텐츠
+
+자, 그럼 {topic}에 대해 본격적으로 알아보겠습니다.
+
+**첫 번째 포인트: [핵심 내용 1]**
+
+먼저 가장 중요한 건 바로 이겁니다. [구체적인 설명과 근거]
+
+실제로 최근 데이터를 보면... [데이터 인용]
+
+이게 왜 중요하냐면... [중요성 설명]
+
+**두 번째 포인트: [핵심 내용 2]**
+
+두 번째로 알아야 할 건... [설명]
+
+여기서 많은 분들이 오해하시는 부분이 있는데... [오해 해결]
+
+실제 사례로 설명드리면... [사례 제시]
+
+[나머지 포인트들도 같은 구조로 전개]""")
+
+            # Conclusion
+            script_sections.append(f"""### 마무리
+
+자, 오늘 {topic}에 대해 함께 알아봤는데 어떠셨나요?
+
+정말 중요한 포인트들만 정리해서 말씀드렸으니까, 꼭 기억해주시고요.
+
+특히 [가장 중요한 포인트 재강조]는 정말 놓치지 마세요.
+
+더 궁금한 점이 있으시면 댓글로 언제든 질문해주시고,
+
+이 영상이 도움이 되셨다면 좋아요와 구독 버튼도 눌러주세요.
+
+그럼 다음 영상에서 또 만나요. 감사합니다!""")
+
+            return "\n\n".join(script_sections)
+
+        except Exception as e:
+            logger.error(f"Error generating full script: {e}")
+            return f"**스크립트 생성 중 오류 발생**: {str(e)}"
+
+    def _generate_thumbnail_designs(self, topic: str, content_angle: str) -> str:
+        """Generate thumbnail design specifications."""
+        try:
+            designs = []
+
+            # Design 1: Urgent/Breaking news style
+            designs.append("""### 🚨 디자인 1: 긴급 속보형
+**레이아웃**: 좌측 인물(60%) + 우측 텍스트(40%)
+**메인 텍스트**: "{}" (김 폰트, 흰색, 검은 테두리)
+**서브 텍스트**: "놓치면 후회!" (빨간색, 작은 크기)
+**배경**: 붉은 그라데이션 (긴급함 연출)
+**인물**: 놀란 표정, 한 손을 이마에
+**그래픽 요소**:
+- 우측 상단: "🔥 HOT" 스티커
+- 하단: YouTube 로고형 화살표
+**컬러 코드**: #FF3333 (빨강), #FFFFFF (흰색), #000000 (검정)""".format(topic))
+
+            # Design 2: Expert authority style
+            designs.append("""### 👨‍💼 디자인 2: 전문가 신뢰형
+**레이아웃**: 중앙 인물(50%) + 좌우 텍스트 배치
+**메인 텍스트**: "{} 완벽 정리" (깔끔한 산세리프, 네이비)
+**서브 텍스트**: "전문가 분석" (골드, 작은 크기)
+**배경**: 깔끔한 화이트/라이트 그레이
+**인물**: 자신감 있는 표정, 정장 또는 깔끔한 복장
+**그래픽 요소**:
+- 좌측: 체크마크 리스트 아이콘
+- 우측: 전문 분석 차트/그래프
+**컬러 코드**: #1E3A8A (네이비), #F59E0B (골드), #F8FAFC (라이트 그레이)""".format(topic))
+
+            # Design 3: Data-driven style
+            designs.append("""### 📊 디자인 3: 데이터 중심형
+**레이아웃**: 상단 텍스트 + 하단 인물&차트
+**메인 텍스트**: "{} 2026 트렌드" (모던 폰트, 다크 블루)
+**서브 텍스트**: "데이터로 보는" (실버, 중간 크기)
+**배경**: 테크닉한 다크 톤 with 데이터 시각화 요소
+**인물**: 분석하는 표정, 차트를 가리키는 제스처
+**그래픽 요소**:
+- 배경: 반투명 차트/그래프 오버레이
+- 코너: 증가 화살표 아이콘
+**컬러 코드**: #0F172A (다크 네이비), #10B981 (에메랄드), #9CA3AF (실버)""".format(topic))
+
+            return "\n\n".join(designs)
+
+        except Exception as e:
+            logger.error(f"Error generating thumbnail designs: {e}")
+            return "**썸네일 디자인 생성 중 오류 발생**"
+
+    def _generate_shooting_guide(self, recommendation: Dict[str, Any]) -> str:
+        """Generate shooting guide."""
+        return """### 📹 카메라 & 렌즈
+- **주 카메라**: Sony A7III 또는 동급 (4K 30fps)
+- **렌즈**: 50mm f/1.8 (인물 촬영) + 24-70mm f/2.8 (B-roll)
+- **보조 카메라**: iPhone 14 Pro (B-roll 및 백업)
+
+### 💡 조명 설정
+- **키 라이트**: 45도 각도, 얼굴 좌측
+- **필 라이트**: 우측에서 그림자 보정
+- **배경 조명**: RGB LED로 무드 연출
+- **색온도**: 5600K (자연광 매치)
+
+### 🎤 오디오 장비
+- **메인 마이크**: Rode PodMic 또는 Shure SM7B
+- **백업**: 핀마이크 (Rode Wireless GO)
+- **오디오 인터페이스**: Zoom PodTrak P4
+- **모니터링**: 헤드폰으로 실시간 체크
+
+### 🎬 촬영 배경
+- **메인 배경**: 깔끔한 화이트/그레이 또는 북쉘프
+- **B-roll 준비**: 관련 자료, 뉴스 클립, 차트/그래프
+- **소품**: 노트북, 서류, 관련 도서
+
+### ⚙️ 카메라 설정
+- **해상도**: 4K (편집에서 1080p로 다운스케일)
+- **프레임레이트**: 30fps (기본), 60fps (슬로우모션용)
+- **조리개**: f/2.8 (배경 분리)
+- **셔터스피드**: 1/60초
+- **ISO**: 100-400 (노이즈 최소화)"""
+
+    def _generate_seo_package(self, topic: str, content_angle: str, recommendation: Dict[str, Any]) -> str:
+        """Generate comprehensive SEO package."""
+        try:
+            seo_keywords = recommendation.get("seo_keywords", [topic])
+
+            # Title variations
+            titles = self._generate_title_options(topic, content_angle)
+            title_section = "\n".join([f"**{i+1}번째**: {title['title']}\n*전략*: {title['strategy']}\n*예상 CTR*: {title['target_ctr']}\n"
+                                     for i, title in enumerate(titles)])
+
+            # Description template
+            description = f"""### 📝 설명란 템플릿
+
+이 영상에서는 {topic}에 대한 핵심 정보를 전문가 관점에서 정리해드립니다.
+
+🎯 이 영상의 핵심 포인트:
+1. [첫 번째 핵심 내용]
+2. [두 번째 핵심 내용]
+3. [세 번째 핵심 내용]
+4. [네 번째 핵심 내용]
+5. [다섯 번째 핵심 내용]
+
+📌 타임스탬프:
+0:00 인트로
+0:45 목차 소개
+1:30 핵심 포인트 1
+3:45 핵심 포인트 2
+6:20 핵심 포인트 3
+8:55 핵심 포인트 4
+11:30 핵심 포인트 5
+13:45 마무리
+
+💡 도움이 되셨다면 좋아요👍와 구독🔔 부탁드려요!
+💬 궁금한 점은 댓글로 남겨주시면 답변드릴게요.
+
+🔗 관련 링크:
+- [관련 자료 링크]
+- [참고 사이트 링크]
+
+#{}
+""".format(" #".join(seo_keywords[:10]))
+
+            # Tags
+            tags_section = f"""### 🏷️ 태그 (30개)
+{', '.join(seo_keywords[:30])}"""
+
+            # Publication strategy
+            pub_strategy = f"""### 📅 공개 전략
+**최적 공개 시간**: 오후 7-9시 (시청자 활동 피크)
+**공개 요일**: {self._suggest_publish_day(recommendation)}
+**카드 설정**: 3분, 7분, 11분에 관련 영상 카드
+**엔드스크린**: 15초간 구독 버튼 + 관련 영상 2개 추천
+**커뮤니티 탭**: 공개 1시간 전 예고 포스트"""
+
+            return f"""### 🎯 제목 3종 (SEO 전략별)
+
+{title_section}
+
+{description}
+
+{tags_section}
+
+{pub_strategy}"""
+
+        except Exception as e:
+            logger.error(f"Error generating SEO package: {e}")
+            return "**SEO 패키지 생성 중 오류 발생**"
+
+    def _suggest_publish_day(self, recommendation: Dict[str, Any]) -> str:
+        """Suggest optimal publishing day based on content type."""
+        topic = recommendation.get("topic", "").lower()
+
+        if any(word in topic for word in ["뉴스", "속보", "발표"]):
+            return "화요일-목요일 (뉴스 반응 활발)"
+        elif any(word in topic for word in ["주식", "부동산", "경제"]):
+            return "일요일-월요일 (주말 정보 소비 증가)"
+        elif any(word in topic for word in ["교육", "가이드", "튜토리얼"]):
+            return "수요일-금요일 (학습 욕구 높은 시기)"
+        else:
+            return "수요일-목요일 (일반적 최적 시기)"
+
+    def _generate_performance_metrics(self, recommendation: Dict[str, Any]) -> str:
+        """Generate expected performance metrics."""
+        performance = recommendation.get("performance_estimate", {})
+
+        estimated_views = performance.get("estimated_views", 1000)
+        confidence = performance.get("confidence", "보통")
+
+        return f"""### 📊 1주차 예상 성과
+- **조회수**: {estimated_views:,}회 (±20%)
+- **좋아요**: {int(estimated_views * 0.05):,}개 (5% 기준)
+- **댓글**: {int(estimated_views * 0.01):,}개 (1% 기준)
+- **구독 전환**: {int(estimated_views * 0.003):,}명 (0.3% 기준)
+- **시청 지속률**: 65-75% (10분 이상 영상 기준)
+
+### 📈 1개월 예상 성과
+- **총 조회수**: {int(estimated_views * 3):,}회
+- **검색 유입**: 40-50% (SEO 최적화 효과)
+- **추천 유입**: 30-40% (YouTube 알고리즘)
+- **외부 유입**: 10-20% (소셜미디어, 블로그)
+
+### 🎯 성과 신뢰도
+**신뢰도**: {confidence}
+**근거**: {performance.get('reasoning', '과거 영상 성과 기반 추정')}"""
+
+    def _generate_competitive_strategy(self, topic: str, recommendation: Dict[str, Any]) -> str:
+        """Generate competitive differentiation strategy."""
+        return f"""### 🔍 동일 주제 상위 영상 분석
+1. **영상A**: 조회수 50K, 길이 15분, 포커스: 기본 정보 나열
+   - *약점*: 깊이 있는 분석 부족, 실용성 낮음
+
+2. **영상B**: 조회수 30K, 길이 8분, 포커스: 간단 요약
+   - *약점*: 전문성 부족, 신뢰성 문제
+
+3. **영상C**: 조회수 25K, 길이 20분, 포커스: 이론적 설명
+   - *약점*: 실무 적용 방안 부재, 지루함
+
+### 🚀 우리의 차별화 포인트
+
+**1. 전문성 + 실용성 결합**
+- 전문 데이터 기반 분석 + 실무 적용 방안 제시
+- 이론만이 아닌 "내일부터 써먹을 수 있는" 실용 정보
+
+**2. 최신성 강화**
+- 가장 최근 데이터와 트렌드 반영
+- 실시간 변화 상황 업데이트
+
+**3. 시각적 차별화**
+- 고품질 차트/그래프로 데이터 시각화
+- 이해하기 쉬운 인포그래픽 활용
+
+**4. 신뢰성 확보**
+- 공식 소스, 전문 기관 데이터 인용
+- 출처 명시로 정보 신뢰도 극대화
+
+**5. 완성도 높은 구성**
+- 초 단위 구조화된 큐시트
+- 명확한 목차와 타임스탬프 제공"""
+
+    def _estimate_competitor_count(self, topic: str) -> str:
+        """Estimate number of competing videos."""
+        # Simple estimation based on topic type
+        if len(topic.split()) == 1:
+            return "50-100개 (경쟁 높음)"
+        elif any(word in topic.lower() for word in ["2026", "최신", "속보"]):
+            return "10-20개 (경쟁 보통)"
+        else:
+            return "20-50개 (경쟁 보통)"
+
+    def _estimate_competitor_views(self, topic: str) -> str:
+        """Estimate average competitor video views."""
+        return "15K-30K (동일 주제 상위 10개 평균)"
+
+    def _generate_differentiation_points(self, topic: str, content_angle: str) -> str:
+        """Generate key differentiation points."""
+        return f"""- **전문성**: 데이터 기반 심도 있는 분석
+- **최신성**: {datetime.now().year}년 최신 트렌드 반영
+- **실용성**: 바로 적용 가능한 실무 팁 제공
+- **완성도**: PD급 큐시트와 구조화된 콘텐츠
+- **신뢰성**: 공식 소스 기반 정보 제공"""
+
+    def _save_plan(self, plan_content: str, topic: str) -> str:
+        """Save the generated plan to file."""
+        try:
+            # Create plan ID
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            safe_topic = re.sub(r'[^\w\-_]', '_', topic)[:30]
+            plan_id = f"{timestamp}_{safe_topic}"
+
+            # Create directory
+            plan_dir = os.path.join(self.data_dir, "plan_history")
+            os.makedirs(plan_dir, exist_ok=True)
+
+            # Save plan
+            file_path = os.path.join(plan_dir, f"{plan_id}.md")
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(plan_content)
+
+            logger.info(f"Plan saved: {file_path}")
+            return plan_id
+
+        except Exception as e:
+            logger.error(f"Error saving plan: {e}")
+            return f"error_{datetime.now().strftime('%H%M%S')}"
+
+
+def test_plan_generator():
+    """Test function for PlanGenerator."""
+    try:
+        generator = PlanGenerator()
+        print("✅ PlanGenerator initialized")
+
+        # Test recommendation
+        test_recommendation = {
+            "topic": "AI 에이전트",
+            "content_angle": "AI 에이전트 실무 활용 완벽 가이드",
+            "trend_score": 8.5,
+            "search_demand": 4.2,
+            "channel_relevance": 4.8,
+            "recency": 7.0,
+            "sources": ["AI Times", "TechCrunch"],
+            "performance_estimate": {
+                "estimated_views": 5000,
+                "confidence": "높음",
+                "reasoning": "AI 트렌드 상승"
+            },
+            "seo_keywords": ["AI", "에이전트", "자동화", "GPT"]
+        }
+
+        print("🔄 Generating comprehensive plan...")
+        result = generator.generate_comprehensive_plan(test_recommendation)
+
+        if result["success"]:
+            print(f"✅ Plan generated: {result['plan_id']}")
+            print(f"📄 File saved: {result['file_path']}")
+            print(f"📊 Estimated views: {result['summary']['estimated_views']}")
+        else:
+            print(f"❌ Plan generation failed: {result['error']}")
+
+        print("✅ All tests passed")
+
+    except Exception as e:
+        print(f"❌ Test failed: {e}")
+
+
+if __name__ == "__main__":
+    test_plan_generator()

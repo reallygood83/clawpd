@@ -2,21 +2,65 @@
   "channel_id": "UCiiUQuKEqhZ1g15EglqnHHg",
   "channel_name": "배움의 달인 (AI·자동화)",
   "channel_url": "https://www.youtube.com/@배움의달인",
+  "description": "안녕하세요! '배움의 달인' 김문정입니다 👋\n\n🚀 배움에는 끝이 없다, 우리는 성장할 뿐!\n\n현직 초등교사이자 AI 전문가, 또 개발자로서, AI 시대의 스마트한 배움과 생산성을 탐구하는 채널입니다.\n단순한 도구 사용법을 넘어, AI와 함께 일하고 성장하는 방법을 공유합니다.\n\n💡 무엇을 다루나요?\n\n✔️ AI 활용 마스터 – ChatGPT, Claude, Gemini 등 최신 AI 200% 활용법\n✔️ AI 에이전트 & 자동화 – 나만의 AI 비서 만들기, 업무 자동화 시스템 구축\n✔️ 바이브 코딩 – 코딩 몰라도 AI와 함께 앱",
   "subscribers": 10500,
   "total_views": 280060,
-  "total_videos": 87,
-  "avg_views_per_video": 3220,
+  "total_videos": 98,
+  "avg_views_per_video": 7043,
   "upload_frequency": "2-3 per week",
   "niche": "AI/테크",
-  "sub_niches": ["AI 교육", "옵시디언", "OpenClaw", "AI 에이전트", "생산성"],
-  "target_audience": ["교사", "직장인", "1인 기업가", "개발자"],
+  "sub_niches": [
+    "AI 교육",
+    "옵시디언",
+    "OpenClaw",
+    "AI 에이전트",
+    "생산성",
+    "바이브코딩"
+  ],
+  "target_audience": [
+    "교사",
+    "직장인",
+    "1인 기업가",
+    "개발자"
+  ],
   "tone": "친근한 교육자 + 실전 데모",
   "typical_length": "10-15분",
-  "top_keywords": ["오픈클로", "openclaw", "옵시디언", "AI 에이전트", "배움의 달인"],
-  "top_videos": [
-    {"title": "OpenClaw 자동매매 시스템 구축", "views": 32000},
-    {"title": "옵시디언 AI 연동 완전정복", "views": 15000},
-    {"title": "Claude Code 실전 활용", "views": 12000}
+  "top_keywords": [
+    "오픈클로",
+    "openclaw",
+    "옵시디언",
+    "AI 에이전트",
+    "Claude",
+    "NotebookLM"
   ],
-  "created_at": "2026-03-08T23:15:00+09:00"
+  "top_videos": [
+    {
+      "title": "노트북LM 슬라이드 워터마크 제거! 노트북LM+제미나이+나노바나나로 AI 고퀄리티 무료 PPT 만들기",
+      "views": 25452,
+      "likes": 786
+    },
+    {
+      "title": "구글 AI 생태계 완벽 정복! NotebookLM + Stitch + Gemini 실전 활용법(무료)",
+      "views": 22735,
+      "likes": 642
+    },
+    {
+      "title": "AI 구독료 0원! Claude Opus 4.6 최신 AI 모델 무료로 쓰기! | 제미나이 엔터프라이즈 무료 사용 꿀팁",
+      "views": 14516,
+      "likes": 371
+    },
+    {
+      "title": "바이브코딩 앱 개발 완전 정복! NotebookLM + Stitch + 구글 AI Studio 🚀",
+      "views": 11527,
+      "likes": 460
+    },
+    {
+      "title": "OpenClaw 자비스 이렇게 씁니다! | AI 대시보드 + 비트코인 자동매매 실전 공개",
+      "views": 9316,
+      "likes": 199
+    }
+  ],
+  "country": "KR",
+  "created_at": "2026-03-09T00:06:00+09:00",
+  "api_verified": true
 }

@@ -29,15 +29,27 @@ class SimpleHTMLParser(HTMLParser):
 
         if tag.lower() == 'title':
             self.in_title = True
-        elif tag.lower() in {'p', 'div', 'article', 'section', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'}:
-            self.in_content = True
+        elif tag.lower() in {'p', 'div', 'article', 'section', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'main', 'content'}:
+            # Check for content-related attributes
+            attrs_dict = dict(attrs) if attrs else {}
+            class_name = attrs_dict.get('class', '').lower()
+            id_name = attrs_dict.get('id', '').lower()
+
+            # Look for content-related classes and IDs
+            content_indicators = ['content', 'article', 'post', 'story', 'news', 'text', 'body', 'main']
+            if any(indicator in class_name or indicator in id_name for indicator in content_indicators):
+                self.in_content = True
+            elif tag.lower() in {'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'}:
+                self.in_content = True
+            elif tag.lower() in {'div', 'article', 'section', 'main'}:
+                self.in_content = True
         elif tag.lower() in self.skip_tags:
             self.in_content = False
 
     def handle_endtag(self, tag):
         if tag.lower() == 'title':
             self.in_title = False
-        elif tag.lower() in {'p', 'div', 'article', 'section', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'}:
+        elif tag.lower() in {'p', 'div', 'article', 'section', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'main', 'content'}:
             self.in_content = False
 
         self.current_tag = ""
@@ -46,9 +58,12 @@ class SimpleHTMLParser(HTMLParser):
         data = data.strip()
         if data:
             if self.in_title:
-                self.title = data
+                if not self.title:  # Only take first title found
+                    self.title = data
             elif self.in_content and self.current_tag not in self.skip_tags:
-                self.content.append(data)
+                # Filter out very short content and navigation-like text
+                if len(data) >= 10 and not any(skip_word in data.lower() for skip_word in ['클릭', 'more', 'read more', '더보기', '광고', 'ad', 'advertisement']):
+                    self.content.append(data)
 
     def get_content(self) -> Dict[str, str]:
         """Get extracted content"""
@@ -141,7 +156,36 @@ class WebScraper:
         """Parse HTML content to extract title and text"""
         parser = SimpleHTMLParser()
         parser.feed(html)
-        return parser.get_content()
+        result = parser.get_content()
+
+        # If no title found, try meta tags
+        if not result['title']:
+            meta_title_pattern = r'<meta[^>]*property=["\']og:title["\'][^>]*content=["\']([^"\']+)["\']'
+            meta_match = re.search(meta_title_pattern, html, re.IGNORECASE)
+            if meta_match:
+                result['title'] = meta_match.group(1)
+
+        # If still no content, try to extract from common patterns
+        if not result['content'] or len(result['content']) < 100:
+            # Try to find main content areas
+            content_patterns = [
+                r'<div[^>]*class="[^"]*content[^"]*"[^>]*>(.*?)</div>',
+                r'<article[^>]*>(.*?)</article>',
+                r'<main[^>]*>(.*?)</main>',
+                r'<div[^>]*class="[^"]*article[^"]*"[^>]*>(.*?)</div>'
+            ]
+
+            for pattern in content_patterns:
+                matches = re.findall(pattern, html, re.DOTALL | re.IGNORECASE)
+                if matches:
+                    # Strip HTML tags and clean up
+                    content_text = re.sub(r'<[^>]+>', ' ', ' '.join(matches))
+                    content_text = re.sub(r'\s+', ' ', content_text).strip()
+                    if len(content_text) > len(result['content']):
+                        result['content'] = content_text
+                    break
+
+        return result
 
     def fetch_news_headlines(self, base_urls: List[str]) -> List[Dict[str, str]]:
         """Fetch headlines from news websites"""

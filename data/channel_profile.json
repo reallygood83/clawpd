@@ -1,0 +1,22 @@
+{
+  "channel_id": "UCiiUQuKEqhZ1g15EglqnHHg",
+  "channel_name": "배움의 달인 (AI·자동화)",
+  "channel_url": "https://www.youtube.com/@배움의달인",
+  "subscribers": 10500,
+  "total_views": 280060,
+  "total_videos": 87,
+  "avg_views_per_video": 3220,
+  "upload_frequency": "2-3 per week",
+  "niche": "AI/테크",
+  "sub_niches": ["AI 교육", "옵시디언", "OpenClaw", "AI 에이전트", "생산성"],
+  "target_audience": ["교사", "직장인", "1인 기업가", "개발자"],
+  "tone": "친근한 교육자 + 실전 데모",
+  "typical_length": "10-15분",
+  "top_keywords": ["오픈클로", "openclaw", "옵시디언", "AI 에이전트", "배움의 달인"],
+  "top_videos": [
+    {"title": "OpenClaw 자동매매 시스템 구축", "views": 32000},
+    {"title": "옵시디언 AI 연동 완전정복", "views": 15000},
+    {"title": "Claude Code 실전 활용", "views": 12000}
+  ],
+  "created_at": "2026-03-08T23:15:00+09:00"
+}

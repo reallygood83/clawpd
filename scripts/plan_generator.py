@@ -6,6 +6,7 @@ Generates cue sheets, full scripts, thumbnails, SEO packages, and shooting guide
 import json
 import logging
 import os
+import re
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 
@@ -122,7 +123,7 @@ class PlanGenerator:
 """
 
     def generate_comprehensive_plan(self, recommendation: Dict[str, Any],
-                                   additional_context: Dict[str, Any] = None) -> Dict[str, Any]:
+                                   additional_context: Dict[str, Any] = None) -> str:
         """Generate a comprehensive PD-level content plan."""
         try:
             logger.info(f"Generating comprehensive plan for: {recommendation.get('topic', 'Unknown')}")
@@ -163,32 +164,12 @@ class PlanGenerator:
             # Save plan
             plan_id = self._save_plan(plan_content, topic)
 
-            result = {
-                "success": True,
-                "plan_id": plan_id,
-                "plan_content": plan_content,
-                "plan_data": plan_data,
-                "file_path": os.path.join(self.data_dir, "plan_history", f"{plan_id}.md"),
-                "summary": {
-                    "topic": topic,
-                    "title_options": plan_data["title"],
-                    "estimated_views": plan_data["performance_estimate"].get("estimated_views", 0),
-                    "confidence": plan_data["performance_estimate"].get("confidence", "보통"),
-                    "timeline": recommendation.get("recommended_timeline", "1주일 내")
-                }
-            }
-
             logger.info(f"Plan generated successfully: {plan_id}")
-            return result
+            return plan_content
 
         except Exception as e:
             logger.error(f"Error generating comprehensive plan: {e}")
-            return {
-                "success": False,
-                "error": str(e),
-                "plan_content": "",
-                "plan_data": {}
-            }
+            return f"# 오류 발생\n\n기획안 생성 중 오류가 발생했습니다: {str(e)}"
 
     def _generate_title_options(self, topic: str, content_angle: str) -> List[Dict[str, str]]:
         """Generate multiple title options with SEO strategies."""
@@ -377,7 +358,7 @@ class PlanGenerator:
             outro_min = outro_start // 60
             outro_sec = outro_start % 60
 
-            cue_sheet.append(f"""### 🎯 마무리 ({"{}:{}".format(outro_min, outro_sec):02d}-{duration_minutes}:00)
+            cue_sheet.append(f"""### 🎯 마무리 ({outro_min}:{outro_sec:02d}-{duration_minutes}:00)
 **카메라**: 클로즈업 → 와이드 샷
 **멘트**: "오늘 {topic}에 대해 정리해봤는데, 어떠셨나요?"
 **B-roll**: 핵심 내용 요약 몽타주
@@ -573,8 +554,8 @@ class PlanGenerator:
 - [관련 자료 링크]
 - [참고 사이트 링크]
 
-#{}
-""".format(" #".join(seo_keywords[:10]))
+#{" #".join(seo_keywords[:10])}
+"""
 
             # Tags
             tags_section = f"""### 🏷️ 태그 (30개)
